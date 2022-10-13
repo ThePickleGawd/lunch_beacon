@@ -1,0 +1,8 @@
+# 0x00: Sleep disabled
+# 0x01: Deep sleep enabled
+# 0x02: Retain all but DO NOT drop to retention voltage
+# 0x03: Retain all and drop to retention voltage
+# 0x04: Hibernate
+# 0x05: SOC off
+# 0x80: Test mask (roll through modes)
+04

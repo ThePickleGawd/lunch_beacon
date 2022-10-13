@@ -1,0 +1,4 @@
+# DEVICE_NAME: 18 character limit!
+# A0000c9
+41			# 'A'
+30 30 30 30 63 39	# "0000c9" ID from BD_ADDRESS

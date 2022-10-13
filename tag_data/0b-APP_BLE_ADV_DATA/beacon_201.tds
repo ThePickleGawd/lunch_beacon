@@ -1,0 +1,19 @@
+# Legacy ADV - no more than 28 bytes of payload
+
+03	# Length of Service List
+03	# Service List
+aa fe	# Eddystone ID
+
+0e			# Length of Service Data
+16			# Service Data
+aa fe			# Eddystone ID
+10			# Frame type: URL
+00			# Power
+01			# https://www.
+61 74 6d 6f 73 69 63	# "atmosic"
+07			# .com
+
+08			# Length of Shortened Local Name
+08			# Shortened Local Name
+41			# 'A'
+30 30 30 30 63 39	# "0000c9" ID from BD_ADDRESS

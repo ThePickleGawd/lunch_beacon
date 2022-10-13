@@ -1,0 +1,9 @@
+1A	# Length
+FF	# Type (Custom Manufacturer Packet)
+4C 00	# Manufacturer ID (Apple)
+02	# SubType (iBeacon)
+15	# SubType Length
+FB 0B 57 A2  82 28  44 CD  91 3A  94 A1 22 BA 12 06	# Proximity UUID
+00 01	# Major
+00 02	# Minor
+FF	# Signal Power

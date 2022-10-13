@@ -1,0 +1,4 @@
+# 0x00: Timer and software wakeup only
+# 0x01: External (from PSEQ) wakeup enabled with limited timeout
+# 0x02: External wakeup enabled with no maximum sleep duration
+01

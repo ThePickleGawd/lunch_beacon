@@ -1,0 +1,3 @@
+### To setup
+
+- Add lunch.c to app.mk FIXME_EXAMPLE_USES_BLE
