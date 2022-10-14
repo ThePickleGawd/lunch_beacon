@@ -1,11 +1,11 @@
 /**
  *******************************************************************************
  *
- * @file BLE_adv.c
+ * @file lunch.c
  *
- * @brief BLE Advertising Application
+ * @brief BLE Advertising Application for the lunch lines
  *
- * Copyright (C) Atmosic 2020-2022
+ * Copyright (C) Dylan Lu 2022
  *
  *******************************************************************************
  */
@@ -29,13 +29,19 @@
 #include "uart_stdout.h"
 #endif
 
+#pragma region SETTINGS
+
+// Settings
+#define CFG_GAP_DEV_NAME "Atmosic Lunch BT"
+
+// only 0 is allowed since the asm only supports one state machine
 #define S_TBL_IDX 0
 
 #ifndef CFG_ADV0_CREATE_MAX_TX_POWER
 #define CFG_ADV0_CREATE_MAX_TX_POWER 0
 #endif
 
-ATM_LOG_LOCAL_SETTING("BLE_adv", D);
+ATM_LOG_LOCAL_SETTING("lunch", D);
 
 static uint8_t activity_idx = ATM_INVALID_ADVIDX;
 static uint32_t restart_time_csec; // centi-seconds
@@ -113,6 +119,10 @@ static void update_adv_timer(uint8_t idx, void const *ctx)
 }
 #endif // CFG_DYN_ADV
 
+#pragma endregion SETTINGS
+
+#pragma region GAP_CALLBACKS
+
 /*
  * @brief Callback registered with the GAP layer
  * @note Called after the GAP layer has initialized
@@ -166,6 +176,10 @@ static const atm_gap_cbs_t gap_callbacks = {
     .init_cfm = adv_init_cfm,
     .phy_ind = adv_phy_ind,
 };
+
+#pragma endregion GAP_CALLBACKS
+
+#pragma region APPLICATION_STATE
 
 static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
 {
@@ -415,6 +429,8 @@ static const state_entry s_tbl[] = {
     {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_ADV_STARTING, ble_adv_restart_adv}
 };
 
+#pragma endregion APPLICATION_STATE
+
 /*
  * @brief Initialize the app data structures and start its state machine
  * @note Called after the platform drivers have initialized
@@ -428,17 +444,21 @@ static rep_vec_err_t user_appm_init(void)
     }
 
     if (restart_time_csec) {
+    // create a sw timer to restart constantly
 	tid_restart = sw_timer_alloc(restart_timer, NULL);
     }
 
+    // update adv if we want to
 #ifdef CFG_DYN_ADV
     tid_update_adv = sw_timer_alloc(update_adv_timer, NULL);
 #endif // CFG_DYN_ADV
 
+    // setup power manager
     adv_lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
     atm_pm_lock(adv_lock_hiber);
     atm_pm_set_hib_restart_time(restart_time_csec);
 
+    // setup application state machine (only allows one state machine)
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));
     atm_asm_set_state_op(S_TBL_IDX, S_INIT, OP_END);
     atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);

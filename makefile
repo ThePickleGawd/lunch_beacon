@@ -17,7 +17,7 @@ FRAMEWORK_MODULES := \
 	atm_log \
 	ble_gap \
 
-UU_TEST := BLE_adv atm_adv
+UU_TEST := lunch atm_adv
 INCLUDES += .
 
 CFLAGS += \
@@ -25,6 +25,7 @@ CFLAGS += \
 	-DNO_ATM_SCAN \
 	-DNO_BLE_GATTC \
 	-DGAP_ADV_PARM_NAME="config_adv_params.h" \
+	-Wno-unknown-pragmas \
 
 ifdef CFG_DYN_ADV
 CFG_NVDS_ADV :=
