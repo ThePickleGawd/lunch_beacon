@@ -17,7 +17,7 @@ FRAMEWORK_MODULES := \
 	atm_log \
 	ble_gap \
 
-UU_TEST := lunch atm_adv
+UU_TEST := lunch_beacon atm_adv
 INCLUDES += .
 
 CFLAGS += \
