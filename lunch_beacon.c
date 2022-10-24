@@ -20,7 +20,7 @@
 #include "atm_gap_param.h"
 #include "nvds.h"
 #include "nvds_tag.h"
-#include "lunch.h"
+#include "lunch_beacon.h"
 #include "atm_asm.h"
 #include "atm_pm.h"
 #include "sw_timer.h"
@@ -30,9 +30,6 @@
 #endif
 
 #pragma region SETTINGS
-
-// Settings
-#define CFG_GAP_DEV_NAME "Atmosic Lunch BT"
 
 // only 0 is allowed since the asm only supports one state machine
 #define S_TBL_IDX 0

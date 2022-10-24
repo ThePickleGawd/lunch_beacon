@@ -1,5 +1,7 @@
 include ../../user/common.mk
 
+BOARD=m2202
+
 ifndef RUN_IN_RAM
 CFG_NVDS_ADV := 1
 endif

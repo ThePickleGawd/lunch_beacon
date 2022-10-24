@@ -4,15 +4,12 @@
 03	# Service List
 aa fe	# Eddystone ID
 
-0e			# Length of Service Data
+17			# Length of Service Data
 16			# Service Data
 aa fe			# Eddystone ID
-10			# Frame type: URL
-00			# Power
-01			# https://www.
-61 74 6d 6f 73 69 63	# "atmosic"
-07			# .com
-
-08			# Length of Shortened Local Name
-08			# Shortened Local Name
-41 74 6D 6F 73 69 63	# 'Atmosic'
+00			# Frame type: UID
+00			# TX Power at 0 meters away
+d9 a7 09 49 5e 0a b9 1d 17 04 # 10-byte namespace (sha1 of lunch.dylanlu.com)
+00 00 00 00 00 00 # 6-byte instance (incremental, needs to be dynamic?)
+00 # Reserved for future use (0x00)
+00 # Reserved for future use (0x00)
