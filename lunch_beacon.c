@@ -25,9 +25,6 @@
 #include "atm_pm.h"
 #include "sw_timer.h"
 #include "co_utils.h"
-#ifdef AUTO_TEST
-#include "uart_stdout.h"
-#endif
 
 #pragma region SETTINGS
 
