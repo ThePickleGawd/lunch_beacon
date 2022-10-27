@@ -257,11 +257,6 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx,
 	} break;
 	case ATM_ADV_OFF: {
 	    atm_asm_move(S_TBL_IDX, OP_ADV_TIMEOUT);
-#ifdef AUTO_TEST
-	    if (!restart_time_csec) {
-		UartEndSimulation();
-	    }
-#endif
 	} break;
 	case ATM_ADV_IDLE:
 	case ATM_ADV_DELETED:
