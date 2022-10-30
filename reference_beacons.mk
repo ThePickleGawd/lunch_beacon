@@ -12,7 +12,7 @@ endif
 # It will advertise forever, allowing us to see it on scanner app
 #
 reference_beacon_lunch_beacon := \
-	$(supply_bd_addr) \
+	01-BD_ADDRESS/beacon_201 \
 	06-APP_BLE_ACT_CRT_CMD/legacy_nc_s_100ms \
 	0b-APP_BLE_ADV_DATA/lunch_beacon \
 	0c-APP_BLE_SCAN_RESP_DATA/lunch_beacon \

@@ -26,6 +26,8 @@
 #include "sw_timer.h"
 #include "co_utils.h"
 
+#include "gap_params.h"
+
 #pragma region SETTINGS
 
 // only 0 is allowed since the asm only supports one state machine
@@ -40,7 +42,7 @@ ATM_LOG_LOCAL_SETTING("lunch", D);
 static uint8_t activity_idx = ATM_INVALID_ADVIDX;
 static uint32_t restart_time_csec; // centi-seconds
 static sw_timer_id_t tid_restart;
-
+#
 #if !defined(ENABLE_USER_ADV_PARAM_SETTING) && defined(CFG_NVDS_ADV)
 static atm_adv_create_t adv_create;
 #endif
@@ -274,7 +276,8 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx,
  */
 static void ble_adv_init(void)
 {
-    atm_gap_start(atm_gap_param_get(), &gap_callbacks);
+    // Use my gap_params
+    atm_gap_start(get_gap_params(), &gap_callbacks);
 
 #if !defined(ENABLE_USER_ADV_PARAM_SETTING) && defined(CFG_NVDS_ADV)
     if (atm_adv_create_param_nvds(false, &adv_create)) {
