@@ -10,6 +10,6 @@ aa fe			# Eddystone ID
 00			# Frame type: UID
 00			# TX Power at 0 meters away
 d9 a7 09 49 5e 0a b9 1d 17 04 # 10-byte namespace (sha1 of lunch.dylanlu.com/PAUSD)
-00 00 00 00 00 00 # 6-byte instance (put 950XXXXX)
+03 00 04 08 06 00 # 6-byte instance (put 950XXXXX)
 00 # Reserved for future use (0x00)
 00 # Reserved for future use (0x00)
