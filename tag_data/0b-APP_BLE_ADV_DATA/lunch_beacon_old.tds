@@ -1,0 +1,18 @@
+# Legacy ADV - no more than 28 bytes of payload
+
+# Figuring out the adv data format
+# https://docs.silabs.com/bluetooth/4.0/general/adv-and-scanning/bluetooth-adv-data-basics
+
+03	# Length of Service List
+03	# Service List
+aa fe	# Eddystone ID
+
+17			# Length of Service Data
+16			# Service Data
+aa fe			# Eddystone ID
+00			# Frame type: UID
+00			# TX Power at 0 meters away
+d9 a7 09 49 5e 0a b9 1d 17 04 # 10-byte namespace (sha1 of lunch.dylanlu.com/PAUSD)
+03 00 04 08 06 00 # 6-byte instance (put 950XXXXX)
+00 # Reserved for future use (0x00)
+00 # Reserved for future use (0x00)

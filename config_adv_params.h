@@ -231,22 +231,13 @@
 // #define ENABLE_USER_ADV_DATA_SCANRSP
 // </c>
 
-#if defined(CFG_DYN_ADV)
 #define BLE_ADV_SIZE 31
-#define ATM_ADV_LEN 27
+#define ATM_ADV_LEN 14
 #define CFG_ADV0_DATA_ADV_PAYLOAD 0x03, 0x03, 0x12, 0x18, 0x16, 0x09, \
-    'A', 't', 'm', 'o', 's', 'i', 'c', ' ', 'a', 'd', 'v', '.', 'c', 'o', 'u', \
-    'n', 't', '=', '0', '0', '0'
+    '9', '5', '0', '3', '0', '4', '8', '6'
 #define CFG_ADV0_DATA_SCANRSP_PAYLOAD 0x03, 0x03, 0x12, 0x18, 0x16, 0x09, \
-    'A', 't', 'm', 'o', 's', 'i', 'c', ' ', 'a', 'd', 'v', '.', 'c', 'o', 'u', \
-    'n', 't', '=', '0', '0', '0'
-#elif defined(ENABLE_USER_ADV_DATA_SCANRSP)
-#define BLE_ADV_DAT_MANU 0x06, 0xFF, 0x0A, 0x24, 0x01, 0x02, 0x00
-#define CFG_ADV0_DATA_ADV_PAYLOAD 0x03, 0x03, 0x12, 0x18, 0x08, 0x09, \
-    'A', 't', 'm', 'o', 's', 'i', 'c', BLE_ADV_DAT_MANU
-#define CFG_ADV0_DATA_SCANRSP_PAYLOAD 0x0F,0x09,0x41,0x74,0x6D,0x6F,0x73,0x69, \
-    0x63,0x20,0x42,0x65,0x61,0x63,0x6F,0x6E
-#endif
+    '9', '5', '0', '3', '0', '4', '8', '6'
+
 
 //</h> // end Advertising Data/ScanRsp Payload
 //=============================================================================

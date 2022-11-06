@@ -10,6 +10,10 @@
  *******************************************************************************
  */
 
+#define CFG_DYN_ADV 1
+#define CFG_ADV_CREATE_PARAM_CONST 0 
+#define CFG_ADV_DATA_PARAM_CONST 0
+
 #include <stdio.h>
 #include <string.h>
 #include "arch.h"
@@ -25,8 +29,9 @@
 #include "atm_pm.h"
 #include "sw_timer.h"
 #include "co_utils.h"
-
-#include "gap_params.h"
+#ifdef AUTO_TEST
+#include "uart_stdout.h"
+#endif
 
 #pragma region SETTINGS
 
@@ -42,59 +47,56 @@ ATM_LOG_LOCAL_SETTING("lunch", D);
 static uint8_t activity_idx = ATM_INVALID_ADVIDX;
 static uint32_t restart_time_csec; // centi-seconds
 static sw_timer_id_t tid_restart;
-#
-#if !defined(ENABLE_USER_ADV_PARAM_SETTING) && defined(CFG_NVDS_ADV)
-static atm_adv_create_t adv_create;
-#endif
-static __ATM_ADV_CREATE_PARAM_CONST atm_adv_create_t *create;
 
-#if !defined(ENABLE_USER_ADV_DATA_SCANRSP) && defined(CFG_NVDS_ADV)
-static atm_adv_data_nvds_t adv_nvds_data;
-static atm_adv_data_nvds_t scan_nvds_data;
-#endif
+static __ATM_ADV_CREATE_PARAM_CONST atm_adv_create_t *create;
 static __ATM_ADV_DATA_PARAM_CONST atm_adv_data_t *adv_data;
 static __ATM_ADV_DATA_PARAM_CONST atm_adv_data_t *scan_data;
-
-#if !defined(ENABLE_USER_ADV_TIMEOUT) && defined(CFG_NVDS_ADV)
-static atm_adv_start_t adv_start;
-#endif
 static __ATM_ADV_START_PARAM_CONST atm_adv_start_t *start;
 
-#ifdef CFG_DYN_ADV
-#define ATM_CNT_IDX 24
-#define USER_DISPLAY_DIGIT 3
+#pragma region CFG_DYN_ADV
+#define ATM_CNT_IDX 24 // starting byte of counting number
+#define USER_DISPLAY_DIGIT 3 // how many digits
 #define ITVL_UPDATE_ADV_PAYLOAD_CS 1000
 static sw_timer_id_t tid_update_adv;
 static uint8_t adv_cnt = 0;
 
 static void update_adv_content(void)
 {
+    // Initialize empty array of size USER_DISPLAY_DIGIT=3
+    // Format adv_cnt to string
     char data_tmp[USER_DISPLAY_DIGIT + 1];
-    snprintf(data_tmp, USER_DISPLAY_DIGIT + 1, "%03d", adv_cnt);
+    snprintf(data_tmp, USER_DISPLAY_DIGIT + 1, "%d", adv_cnt);
 
     DEBUG_TRACE("%s: adv count (%d)", __func__, adv_cnt);
     adv_cnt++;
 
     if (adv_data) {
-	adv_data->len = ATM_ADV_LEN;
-	memcpy(&(adv_data->data[ATM_CNT_IDX]), data_tmp,
-	    USER_DISPLAY_DIGIT);
-	ble_err_code_t ret = atm_adv_set_adv_data(activity_idx, adv_data);
-	if (ret != BLE_ERR_NO_ERROR) {
-	    ATM_LOG(E, "%s: Set adv data failed: %#x", __func__, ret);
-	    return;
-	}
+        // Set length of data to 27 bytes
+        adv_data->len = ATM_ADV_LEN;
+
+        // Copy the 3 digits starting with data[24]
+        // This chages data[24] data[25] data[26]
+        memcpy(&(adv_data->data[ATM_CNT_IDX]), data_tmp,
+            USER_DISPLAY_DIGIT);
+
+        // Set the advertising data
+        ble_err_code_t ret = atm_adv_set_adv_data(activity_idx, adv_data);
+        if (ret != BLE_ERR_NO_ERROR) {
+            ATM_LOG(E, "%s: Set adv data failed: %#x", __func__, ret);
+            return;
+        }
     }
 
+    // Do the same for scan data
     if (scan_data) {
-	scan_data->len = ATM_ADV_LEN;
-	memcpy(&(scan_data->data[ATM_CNT_IDX]), data_tmp,
-	    USER_DISPLAY_DIGIT);
-	ble_err_code_t ret = atm_adv_set_scan_data(activity_idx, scan_data);
-	if (ret != BLE_ERR_NO_ERROR) {
-	    ATM_LOG(E, "%s: Set scan data failed: %#x", __func__, ret);
-	    return;
-	}
+        scan_data->len = ATM_ADV_LEN;
+        memcpy(&(scan_data->data[ATM_CNT_IDX]), data_tmp,
+            USER_DISPLAY_DIGIT);
+        ble_err_code_t ret = atm_adv_set_scan_data(activity_idx, scan_data);
+        if (ret != BLE_ERR_NO_ERROR) {
+            ATM_LOG(E, "%s: Set scan data failed: %#x", __func__, ret);
+            return;
+        }
     }
 }
 
@@ -113,7 +115,7 @@ static void update_adv_timer(uint8_t idx, void const *ctx)
     sw_timer_set(tid_update_adv, ITVL_UPDATE_ADV_PAYLOAD_CS);
     update_adv_content();
 }
-#endif // CFG_DYN_ADV
+#pragma endregion CFG_DYN_ADV // CFG_DYN_ADV
 
 #pragma endregion SETTINGS
 
@@ -256,6 +258,11 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx,
 	} break;
 	case ATM_ADV_OFF: {
 	    atm_asm_move(S_TBL_IDX, OP_ADV_TIMEOUT);
+#ifdef AUTO_TEST
+	    if (!restart_time_csec) {
+		UartEndSimulation();
+	    }
+#endif
 	} break;
 	case ATM_ADV_IDLE:
 	case ATM_ADV_DELETED:
@@ -276,48 +283,13 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx,
  */
 static void ble_adv_init(void)
 {
-    // Use my gap_params
-    atm_gap_start(get_gap_params(), &gap_callbacks);
-
-#if !defined(ENABLE_USER_ADV_PARAM_SETTING) && defined(CFG_NVDS_ADV)
-    if (atm_adv_create_param_nvds(false, &adv_create)) {
-	create = &adv_create;
-    } else {
-	ATM_LOG(E, "%s: NVDS tag for create adv param not found.", __func__);
-	ASSERT_ERR(0);
-    }
-#else
+    atm_gap_start(atm_gap_param_get(), &gap_callbacks);
     create = atm_adv_create_param_get(0);
-#endif
 
-#if !defined(ENABLE_USER_ADV_DATA_SCANRSP) && defined(CFG_NVDS_ADV)
-    if (atm_adv_advdata_param_nvds(&adv_nvds_data)) {
-	adv_data = atm_adv_convert_nvds_data_type(&adv_nvds_data);
-    } else {
-	ATM_LOG(V, "%s: NVDS tag for set adv data param not found.", __func__);
-    }
-
-    if (atm_adv_scandata_param_nvds(&scan_nvds_data)) {
-	scan_data = atm_adv_convert_nvds_data_type(&scan_nvds_data);
-    } else {
-	ATM_LOG(V, "%s: NVDS tag for set scan resp param not found.", __func__);
-    }
-#else
     adv_data = atm_adv_advdata_param_get(0);
     scan_data = atm_adv_scandata_param_get(0);
-#endif
 
-#if !defined(ENABLE_USER_ADV_TIMEOUT) && defined(CFG_NVDS_ADV)
-    if (atm_adv_start_param_nvds(&adv_start)) {
-	start = &adv_start;
-    } else {
-	ATM_LOG(D, "%s: NVDS tag for adv timeout param not found. Using default"
-	    , __func__);
-	start = atm_adv_start_param_get(0);
-    }
-#else
     start = atm_adv_start_param_get(0);
-#endif
 }
 
 /*
@@ -346,10 +318,10 @@ static void ble_adv_start_adv(void)
  */
 static void ble_adv_start_on(void)
 {
-#ifdef CFG_DYN_ADV
+    ATM_LOG(D, "TODO: This is where we fetch 950 from flash memory");
     update_adv_content();
     sw_timer_set(tid_update_adv, ITVL_UPDATE_ADV_PAYLOAD_CS);
-#endif // CFG_DYN_ADV
+
     atm_asm_set_state_op(S_TBL_IDX, S_ADV_STARTED, OP_END);
 }
 
