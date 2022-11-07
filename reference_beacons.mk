@@ -14,10 +14,10 @@ endif
 reference_beacon_lunch_beacon := \
 	01-BD_ADDRESS/beacon_201 \
 	06-APP_BLE_ACT_CRT_CMD/legacy_nc_s_100ms \
-	0b-APP_BLE_ADV_DATA/lunch_beacon \
-	0c-APP_BLE_SCAN_RESP_DATA/lunch_beacon \
 	11-SLEEP_ENABLE/ret_drop \
 	12-EXT_WAKEUP_ENABLE/enable \
+	0b-APP_BLE_ADV_DATA/lunch_beacon \
+	0c-APP_BLE_SCAN_RESP_DATA/lunch_beacon \
 
 #
 # power_profile
