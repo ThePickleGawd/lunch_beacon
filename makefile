@@ -7,7 +7,14 @@ CFG_NVDS_ADV := 1
 endif
 DEBUG := 1
 
-DRIVERS := interrupt timer sw_timer atm_ble atm_pm
+DRIVERS := \
+	interrupt \
+ 	timer \
+	sw_timer \
+	atm_ble \
+	atm_pm \
+	atm_gpio \
+
 LIBRARIES := prf
 
 FRAMEWORK_MODULES := \
@@ -31,7 +38,9 @@ SRC_BT = src/bt
 C_SRCS += $(SRC_BT)/atts_gatt.c
 INCLUDES += $(SRC_BT)
 
-INCLUDES += . $(SRC_TOP)
+# application: top
+C_SRCS += $(SRC_TOP)/BLE_adv.c $(SRC_TOP)/BLE_att_server.c
+INCLUDES += $(SRC_TOP)
 
 UU_TEST := lunch_beacon atm_adv
 INCLUDES += .

@@ -14,9 +14,7 @@
 
 /**
  *******************************************************************************
- * @brief Get current connection index.
- * @return Return current connection index.
+ * @brief Setup BLE_att_server
  *******************************************************************************
  */
-uint8_t atts_get_curr_conidx(void);
-
+void setup_BLE_att_server(void);

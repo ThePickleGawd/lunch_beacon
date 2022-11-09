@@ -298,10 +298,9 @@ static rep_vec_err_t user_appm_init(void)
 /**
  * @brief Application user main(). Driver initialization and rep_vec additions
  */
-int main(void)
+void setup_BLE_att_server(void)
 {
     // Vector replacement
     RV_APPM_INIT_ADD_LAST(&user_appm_init);
-    return 0;
 }
 
