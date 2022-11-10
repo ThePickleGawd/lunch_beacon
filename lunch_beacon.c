@@ -8,7 +8,7 @@
 #include "BLE_adv.h"
 #include "BLE_att_server.h"
 
-#define GPIO_MODE_0 1
+#define GPIO_MODE_0 9
 
 static void setup(void) 
 {

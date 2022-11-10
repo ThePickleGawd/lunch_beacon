@@ -387,6 +387,8 @@ static uint8_t atts_write_req(uint8_t conidx, uint8_t att_idx,
 	    ATM_LOG(D, "[==========]");
 	} else {
 	    ATM_LOG(D, " - Get Unknown command");
+		echo_rw_buff[15] = '\0';
+		ATM_LOG(D, "%s", (char *)echo_rw_buff);
 	}
     } else if (att_idx == atts_attr_handle[ATTS_CHAR_NT_CCCD_ECHO]) {
 	if (len != sizeof(echo_nt_cccd)) {

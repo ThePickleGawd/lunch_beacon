@@ -18,7 +18,8 @@ reference_beacon_lunch_beacon := \
 	12-EXT_WAKEUP_ENABLE/enable \
 	0b-APP_BLE_ADV_DATA/lunch_beacon \
 	0c-APP_BLE_SCAN_RESP_DATA/lunch_beacon \
-
+	#05-APP_BLE_ACT_STRT_CMD/30_adv \
+	
 #
 # power_profile
 #
