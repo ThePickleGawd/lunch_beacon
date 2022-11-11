@@ -14,6 +14,7 @@ DRIVERS := \
 	atm_ble \
 	atm_pm \
 	atm_gpio \
+	spi_flash \
 
 LIBRARIES := prf
 

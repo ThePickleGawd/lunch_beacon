@@ -3,6 +3,7 @@
 #include <string.h>
 #include "arch.h"
 #include "atm_gpio.h"
+#include "spi_flash.h"
 
 // My stuff
 #include "BLE_adv.h"
@@ -25,8 +26,10 @@ static void setup(void)
     atm_gpio_clear_input(GPIO_MODE_0);
 
     // Start program based on mode
-    if(mode0) setup_BLE_adv();
-    else setup_BLE_att_server();
+    //if(mode0) setup_BLE_adv();
+    //else setup_BLE_att_server();
+
+
 }
 
 int main(void) {
