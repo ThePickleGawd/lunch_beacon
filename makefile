@@ -14,7 +14,8 @@ DRIVERS := \
 	atm_ble \
 	atm_pm \
 	atm_gpio \
-	spi_flash \
+	atm_button \
+	sw_event \
 
 LIBRARIES := prf
 
@@ -31,6 +32,9 @@ FRAMEWORK_MODULES := \
 	ble_atmprfs \
 	ble_gap_sec \
 	ble_gattc \
+
+# flash stuff
+USER_SIZE = 0x58000
 
 SRC_TOP = src
 SRC_BT = src/bt
@@ -50,6 +54,7 @@ CFLAGS += \
 	-DNO_GAP_SEC \
 	-DNO_ATM_SCAN \
 	-DNO_BLE_GATTC \
+	-Wno-error=unused-function
 
 # att server stuff
 CFLAGS += \
