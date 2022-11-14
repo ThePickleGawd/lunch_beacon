@@ -272,7 +272,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx,
  */
 static void ble_adv_init(void)
 {
-    atm_gap_start(get_gap_params(), &gap_callbacks);
+    atm_gap_start(atm_gap_param_get(), &gap_callbacks);
 
 #if !defined(ENABLE_USER_ADV_PARAM_SETTING) && defined(CFG_NVDS_ADV)
     if (atm_adv_create_param_nvds(false, &adv_create)) {
@@ -452,7 +452,7 @@ static rep_vec_err_t user_appm_init(void)
  * user_main()
  * Driver initialization and rep_vec additions
  */
-void setup_BLE_adv(void)
+int main(void)
 {
     /*
      * Vector replacement
@@ -460,4 +460,5 @@ void setup_BLE_adv(void)
     RV_APPM_INIT_ADD_LAST(user_appm_init);
 
     ATM_LOG(D, "user_main() done");
+    return 0;
 }

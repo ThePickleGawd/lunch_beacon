@@ -83,3 +83,14 @@ void atts_create_prf(void);
  *******************************************************************************
  */
 void atts_init_done(void);
+
+/**
+ *******************************************************************************
+ * @brief Reflect extra echo data to the echo characteristic triggered by other
+ * callback event
+ *
+ * @param[in] echo_data data to be echoed
+ *******************************************************************************
+ */
+__NONNULL_ALL
+void atts_send_echo(char const *echo_data);

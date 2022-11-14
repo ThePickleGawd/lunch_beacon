@@ -18,8 +18,12 @@
 #include "atts_gatt.h"
 #include "atm_asm.h"
 #include "atm_pm.h"
-#include "co_utils.h"
+#include "atm_utils_c.h"
 #include "rep_vec.h"
+#ifdef CFG_WITH_BLINKY_DEMO
+#include "atts_button.h"
+#include "led_blink.h"
+#endif
 
 #define S_TBL_IDX 0
 
@@ -53,7 +57,11 @@ ATM_LOG_LOCAL_SETTING("BLE_att_server", D);
 
 static uint8_t adv_idx;
 static pm_lock_id_t atts_lock_hib;
+#ifdef CFG_NVDS_ADV
 static atm_adv_data_nvds_t atts_adv_data, atts_scan_data;
+#endif
+static atm_adv_data_t __ATM_ADV_DATA_PARAM_CONST *adv_data;
+static atm_adv_data_t __ATM_ADV_DATA_PARAM_CONST *scan_data;
 
 STATIC_ASSERT(ATT_SERVER_LINK_MAX <= BLE_CONNECTION_MAX,
     "ATT_SERVER_LINK_MAX over BLE_CONNECTION_MAX");
@@ -67,10 +75,17 @@ static void adv_create_cfm(uint8_t idx, ble_err_code_t status)
     ATM_LOG(D, "%s: status: %#x", __func__, status);
 
     adv_idx = idx;
+#ifdef CFG_NVDS_ADV
     atm_adv_advdata_param_nvds(&atts_adv_data);
     atm_adv_scandata_param_nvds(&atts_scan_data);
-    atm_adv_set_adv_data(idx, atm_adv_convert_nvds_data_type(&atts_adv_data));
-    atm_adv_set_scan_data(idx, atm_adv_convert_nvds_data_type(&atts_scan_data));
+    adv_data = atm_adv_convert_nvds_data_type(&atts_adv_data);
+    scan_data = atm_adv_convert_nvds_data_type(&atts_scan_data);
+#else
+    adv_data = atm_adv_advdata_param_get(0);
+    scan_data = atm_adv_scandata_param_get(0);
+#endif
+    atm_adv_set_adv_data(idx, adv_data);
+    atm_adv_set_scan_data(idx, scan_data);
 }
 
 /**
@@ -131,6 +146,31 @@ static void adv_evt_hdlr(atm_adv_state_t state, uint8_t idx,
 	} break;
     }
 }
+
+#ifdef CFG_WITH_BLINKY_DEMO
+/**
+ * @brief MMI Button event handler
+ */
+static void client_app_key_handler(uint8_t idx, atts_button_action_t key_action)
+{
+    ATM_LOG(V, "%s: idx:%d, %d", __func__, idx, key_action);
+    switch (key_action) {
+	case ATTS_BTN_TAP: {
+	    char btn_click_msg[20];
+	    snprintf(btn_click_msg, 20, "btn%d clicked", idx);
+	    atts_send_echo(btn_click_msg);
+	} break;
+
+	case ATTS_BTN_PRESS: {
+	    led_off(idx);
+	} break;
+
+	default: {
+	    ATM_LOG(W, "unhandle key(%d)action(%d)", idx, key_action);
+	} break;
+    }
+}
+#endif
 
 /**
  * @brief Callback registered with the atm_gap module. Triggers the disconnect
@@ -286,6 +326,10 @@ static rep_vec_err_t user_appm_init(void)
     bool init_app = true;
     ATM_LOG(D, "%s:", __func__);
 
+#ifdef CFG_WITH_BLINKY_DEMO
+    atts_btn_init(client_app_key_handler);
+#endif
+
     // Init. application state table
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));
 
@@ -298,9 +342,10 @@ static rep_vec_err_t user_appm_init(void)
 /**
  * @brief Application user main(). Driver initialization and rep_vec additions
  */
-void setup_BLE_att_server(void)
+int main(void)
 {
     // Vector replacement
     RV_APPM_INIT_ADD_LAST(&user_appm_init);
+    return 0;
 }
 

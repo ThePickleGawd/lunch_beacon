@@ -17,6 +17,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "co_list.h"
+#ifdef CFG_WITH_BLINKY_DEMO
+#include "led_blink.h"
+#endif
 
 #ifdef GAP_PARM_NAME
 #include STR(GAP_PARM_NAME)
@@ -385,10 +388,24 @@ static uint8_t atts_write_req(uint8_t conidx, uint8_t att_idx,
 	    ATM_LOG(D, "| x      x |");
 	    ATM_LOG(D, "|x        x|");
 	    ATM_LOG(D, "[==========]");
-	} else {
+#ifdef CFG_WITH_BLINKY_DEMO
+#define STR_LED_ON(x) "led"#x" on"
+#define STR_LED_OFF(x) "led"#x" off"
+	} else if (!memcmp(echo_rw_buff, STR_LED_ON(0),
+	    sizeof(STR_LED_ON(0)))) {
+	    led_on(LED_0);
+        } else if (!memcmp(echo_rw_buff, STR_LED_OFF(0),
+	    sizeof(STR_LED_OFF(0)))) {
+	    led_off(LED_0);
+        } else if (!memcmp(echo_rw_buff, STR_LED_ON(1),
+	    sizeof(STR_LED_ON(1)))) {
+	    led_on(LED_1);
+        } else if (!memcmp(echo_rw_buff, STR_LED_OFF(1),
+	    sizeof(STR_LED_OFF(1)))) {
+	    led_off(LED_1);
+#endif
+        } else {
 	    ATM_LOG(D, " - Get Unknown command");
-		echo_rw_buff[15] = '\0';
-		ATM_LOG(D, "%s", (char *)echo_rw_buff);
 	}
     } else if (att_idx == atts_attr_handle[ATTS_CHAR_NT_CCCD_ECHO]) {
 	if (len != sizeof(echo_nt_cccd)) {
@@ -485,6 +502,12 @@ static void atts_write_cfm(uint8_t conidx, uint8_t att_idx)
 	    ATM_LOG(D, " - Notify is off");
 	}
     }
+}
+
+void atts_send_echo(char const *echo_data)
+{
+    atts_send_ntf_ind_all_links(true, atts_attr_handle[ATTS_CHAR_NT_ECHO],
+	(uint8_t const *)echo_data, strlen(echo_data));
 }
 
 /**
