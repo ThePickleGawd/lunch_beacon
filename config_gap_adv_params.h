@@ -37,3 +37,17 @@
 #elif (SEC_PROP == 1)
 #define ATTS_SVC_SEC_PROPERTY BLE_SEC_PROP_UNAUTH
 #endif
+
+/*
+ * MY STUFF
+ *******************************************************************************
+ */
+
+#define CFG_ADV0_CREATE_MAX_TX_POWER 0
+
+#define CFG_ADV0_DATA_ADV_PAYLOAD \
+    0x0c,0x09,'L','u','n','c','h','-','L','i','n','e','s'
+
+#define CFG_ADV0_DATA_SCANRSP_PAYLOAD \
+    0x09,0xff,0x00,0x60,'A','T','M','B','L','E'
+    
