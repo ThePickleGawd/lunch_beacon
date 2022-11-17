@@ -5,6 +5,6 @@ f5 2a # Fixed string 16
 
 13 # Length
 16 # Service Data
-2a f5 # Fixed string 16
+f5 2a # Fixed string 16
 b4 b8 85 e7 11 79 # 6 bytes of SHA-1 Hash of school name (GUNN)
 FF FF 09 05 00 03 00 04 08 06 # 10 byte student id (pad with FF)

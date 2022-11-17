@@ -1,9 +1,13 @@
 
-REF_BCN := lunch_beacon
+REF_BCN := blank
 
 ifdef SUPPLY_BD_ADDR
 supply_bd_addr := 01-BD_ADDRESS/beacon_201
 endif
+
+reference_beacon_blank := \
+	01-BD_ADDRESS/beacon_201 \
+	11-SLEEP_ENABLE/ret_drop \
 
 #
 # Lunch Beacon
