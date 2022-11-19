@@ -44,7 +44,9 @@ CFLAGS += \
 	-DENABLE_USER_ADV_PARAM_SETTING \
 	-DENABLE_USER_ADV_DATA_SCANRSP \
 	-DCFG_ADV_DATA_PARAM_CONST=0 \
-	-DGAP_ADV_PARM_NAME="config_gap_adv_params.h" \
+	-DCFG_GAP_ADV_MAX_INST=2 \
+	-DGAP_ADV_PARM_NAME="cfg_adv_params.h" \
+	-DGAP_PARM_NAME="cfg_gap_params.h"
 
 
 include reference_beacons.mk
