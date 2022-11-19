@@ -27,23 +27,19 @@
 ATM_LOG_LOCAL_SETTING("Lunch Beacon", D);
 
 /*
- * DEFINE
+ * FUNCTION DECLARATIONS
+ *******************************************************************************
+ */
+
+static uint8_t act_to_idx(uint8_t act_idx);
+static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_code_t status);
+
+/*
+ * DEFINES
  *******************************************************************************
  */
 
 #define S_TBL_IDX 0
-
-static uint8_t act_to_idx(uint8_t act_idx)
-{
-    for (uint8_t idx = 0; idx < CFG_GAP_ADV_MAX_INST; idx++) {
-	if (app_env.act_idx[idx] == act_idx) {
-	    return idx;
-	}
-    }
-    ATM_LOG(E, "act_to_idx not find: act_idx=%d", act_idx);
-    ASSERT_ERR(0);
-    return 0;
-}
 
 #define GET_CREATE_ADV(act_idx) (app_env.create[act_to_idx(act_idx)])
 #define GET_START_ADV(act_idx) (app_env.start[act_to_idx(act_idx)])
@@ -51,7 +47,7 @@ static uint8_t act_to_idx(uint8_t act_idx)
 #define GET_SCAN_DATA(act_idx) (app_env.scan_data[act_to_idx(act_idx)])
 
 /*
- * VARIABLE
+ * VARIABLES
  *******************************************************************************
  */
 
@@ -60,7 +56,7 @@ static pm_lock_id_t adv_lock_hiber;
 static uint8_t activity_idx = ATM_INVALID_ACTIDX;
 
 /*
- * GAP CALLBACK
+ * GAP CALLBACKS
  *******************************************************************************
  */
 
@@ -70,10 +66,13 @@ static uint8_t activity_idx = ATM_INVALID_ACTIDX;
  */
 static void adv_init_cfm(ble_err_code_t status)
 {
+    // Register adv state change callbacks
+    atm_adv_reg(adv_state_change);
+
     // Set max transmit power
     atm_ble_set_txpwr_max(CFG_ADV0_CREATE_MAX_TX_POWER);
 
-    atm_asm_move(S_TBL_IDX, OP_START_ADV);
+    atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
 } 
 
 /*
@@ -119,12 +118,27 @@ static const atm_gap_cbs_t gap_callbacks = {
 };
 
 /*
- * STATIC FUNCTION
+ * STATIC FUNCTIONS
  *******************************************************************************
  */
 
+static uint8_t act_to_idx(uint8_t act_idx)
+{
+    for (uint8_t idx = 0; idx < CFG_GAP_ADV_MAX_INST; idx++) {
+	if (app_env.act_idx[idx] == act_idx) {
+	    return idx;
+	}
+    }
+    ATM_LOG(E, "act_to_idx not find: act_idx=%d", act_idx);
+    ASSERT_ERR(0);
+    return 0;
+}
+
+// BLE create confirmation
 static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
 {
+    ATM_LOG(D, "%s", __func__);
+
     ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
     activity_idx = act_idx;
 
@@ -133,31 +147,35 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     if(app_env.create_adv_idx == LUNCH_ADV_TYPE) idx = IDX_LUNCH;
     if(app_env.create_adv_idx == PAIR_ADV_TYPE) idx = IDX_PAIR_ADV;
 
+    app_env.act_idx[idx] = act_idx;
+    app_env.adv_data[idx] = atm_adv_advdata_param_get(idx);
+    app_env.scan_data[idx] = atm_adv_scandata_param_get(idx);
+
     {
-        ble_err_code_t ret = atm_adv_set_data_sanity(GET_CREATE_ADV(idx), GET_ADV_DATA(idx), GET_SCAN_DATA(idx));
+        ble_err_code_t ret = atm_adv_set_data_sanity(app_env.create[idx], app_env.adv_data[idx], app_env.scan_data[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Set data sanity failed: %#x", __func__, ret);
             return;
         }
     }
 
-    if(GET_ADV_DATA(idx)) {
-        ble_err_code_t ret = atm_adv_set_adv_data(activity_idx, GET_ADV_DATA(idx));
+    if(app_env.adv_data[idx]) {
+        ble_err_code_t ret = atm_adv_set_adv_data(activity_idx, app_env.adv_data[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Set adv data failed: %#x", __func__, ret);
 	        return;
         }
     }
 
-    if(GET_SCAN_DATA(idx)) {
-        ble_err_code_t ret = atm_adv_set_scan_data(activity_idx, GET_SCAN_DATA(idx));
+    if(app_env.scan_data[idx]) {
+        ble_err_code_t ret = atm_adv_set_scan_data(activity_idx, app_env.scan_data[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Set scan data failed: %#x", __func__, ret);
 	        return;
         }
     }
 
-    if(!GET_SCAN_DATA(idx) && !GET_ADV_DATA(idx)) {
+    if(!app_env.scan_data[idx] && !app_env.adv_data[idx]) {
         ble_err_code_t ret = atm_adv_start(activity_idx, GET_START_ADV(idx));
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Failed to start adv with status %#x", __func__, ret);
@@ -201,11 +219,11 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
         case ATM_ADV_ON: {
             ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
             if(act_to_idx(act_idx) == IDX_LUNCH) {
-                // Lunch beaconing mode
-                atm_asm_move(S_TBL_IDX, OP_START_ADV_CFM);
+                // Lunch beacon confirmation (can start now)
+                atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_CFM);
             } else {
-                // Pairing mode
-
+                // Pairing mode confirmation (can start now)
+                atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_CFM);
             }
         } break;
         case ATM_ADV_OFF: {
@@ -224,7 +242,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 }
 
 /*
- * STATE MACHINE
+ * STATE MACHINES
  *******************************************************************************
  */
 
@@ -236,38 +254,11 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 static void ble_init(void)
 {
     // Create gatt profile
-    ATM_LOG(W, "TODO: Create Gatt Profile (in another file)");
+    ATM_LOG(W, "TODO: Create Gatt Profile (in another file)%s", "");
     //atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL)
 
     // Start gap
     atm_gap_start(atm_gap_param_get(), &gap_callbacks);
-
-    // Get BLE params, which are overrided by header file
-    create = atm_adv_create_param_get(0);
-    adv_data = atm_adv_advdata_param_get(0);
-    scan_data = atm_adv_scandata_param_get(0);
-    start = atm_adv_start_param_get(0);
-}
-
-/*
- * @brief Triggers creation and start of the advertisement. Results in a state
- * machine transition from S_IDLE -> S_ADV_STARTING
- * @note Called upon GAP initialization
- */
-static void ble_start_adv(void)
-{
-    ble_err_code_t ret = atm_adv_timeout_param_print(create, start);
-
-    if(ret != BLE_ERR_NO_ERROR) {
-        ATM_LOG(E, "%s: Failed to print adv timeout param %d", __func__, ret);
-	    return;
-    }
-
-    atm_adv_reg(adv_state_change);
-    ret = atm_adv_create(create);
-    if(ret != BLE_ERR_NO_ERROR) {
-        ATM_LOG(E, "%s: Failed to create adv %#x", __func__, ret);
-    }
 }
 
 /*
@@ -333,6 +324,7 @@ static void ble_create_lunch_adv(void)
 
     // TODO: Fetch 950 number here from nvds
     ATM_LOG(D, "Fetch 950 number here%s","");
+    ATM_LOG(D, "Act idx: %d", app_env.act_idx[IDX_LUNCH]);
 
     if(app_env.act_idx[IDX_LUNCH] != ATM_INVALID_ACTIDX) {
         atm_adv_start(app_env.act_idx[IDX_LUNCH], app_env.start[IDX_LUNCH]);
@@ -344,20 +336,45 @@ static void ble_create_lunch_adv(void)
 
 static void ble_create_pair_adv(void)
 {
+    // Fetch params
+    app_env.create[IDX_PAIR_ADV] = atm_adv_create_param_get(IDX_PAIR_ADV);
+    app_env.start[IDX_PAIR_ADV] = atm_adv_start_param_get(IDX_PAIR_ADV);
 
+    app_env.create_adv_idx = PAIR_ADV_TYPE;
+    atm_adv_create(app_env.create[IDX_PAIR_ADV]); // adv_state_change (ATM_ADV_CREATED)
 }
+
+static void ble_delete_pair_adv(void)
+{
+    ATM_LOG(D, "Delete Pairing ADV%s", "");
+    atm_adv_delete(app_env.act_idx[IDX_PAIR_ADV]);
+}
+
+// Once we create it and call the cfm
+// the ASM in atm_adv will callback with ADV_ON State or whatever
 
 // S_OP(state, operation), next_state, handler
 // When we are in STATE, and then receive OPERATION, move to NEXT_STATE and call handler
 static const state_entry s_tbl[] = {
+    // Initialize module
     {S_OP(S_INIT, OP_MODULE_INIT), S_IDLE, ble_init},
-    {S_OP(S_IDLE, OP_START_ADV), S_ADV_STARTING, ble_start_adv},
-    {S_OP(S_ADV_STARTING, OP_START_ADV_CFM), S_ADV_STARTED, ble_start_on},
+    // Create lunch beacon
+    {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, ble_create_lunch_adv},
+    // Create pairing beacon
+    {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, ble_create_pair_adv},
+    // Delete the pairing beacon
+    {S_OP(S_STARTING_PAIR_ADV, OP_DELETE_PAIR_ADV), S_IDLE, ble_delete_pair_adv},
+    // Start the lunch beacon after receiving confirmation
+    {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, ble_start_on},
+    // Start the pairing beacon after receiving confirmation
+    {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, ble_start_on},
+    
+    // Handle connections, timeouts, restarts
     {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, ble_connected},
     {S_OP(S_CONNECTED, OP_DISCONNECTED), S_ADV_STOPPED, ble_disconnected},
     {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, ble_connected},
     {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, ble_timeout},
-    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_ADV_STARTING, ble_restart_adv}
+    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_STARTING_LUNCH_ADV, ble_restart_adv}
 };
 
 

@@ -14,7 +14,8 @@
 typedef enum {
     S_INIT,
     S_IDLE,
-    S_ADV_STARTING,
+    S_STARTING_LUNCH_ADV,
+    S_STARTING_PAIR_ADV,
     S_ADV_STARTED,
     S_ADV_STOPPED,
     S_CONNECTED,
@@ -22,9 +23,11 @@ typedef enum {
 
 typedef enum {
     OP_MODULE_INIT,
-    OP_CREATE_ADV,
-    OP_START_ADV,
-    OP_START_ADV_CFM,
+    OP_CREATE_LUNCH_ADV,
+    OP_CREATE_PAIR_ADV,
+    OP_DELETE_PAIR_ADV,
+    OP_CREATE_LUNCH_CFM,
+    OP_CREATE_PAIR_CFM,
     OP_RESTART_ADV,
     OP_ADV_TIMEOUT,
     OP_CONNECTED,
@@ -46,10 +49,10 @@ typedef enum {
 STATIC_ASSERT(IDX_MAX <= CFG_GAP_ADV_MAX_INST, "CFG_GAP_ADV_MAX_INST too small!");
 
 typedef struct {
-    atm_adv_create_t *create[CFG_GAP_ADV_MAX_INST];
-    atm_adv_start_t *start[CFG_GAP_ADV_MAX_INST];
-    atm_adv_data_t *adv_data[CFG_GAP_ADV_MAX_INST];
-    atm_adv_data_t *scan_data[CFG_GAP_ADV_MAX_INST];
+    __ATM_ADV_CREATE_PARAM_CONST atm_adv_create_t *create[CFG_GAP_ADV_MAX_INST];
+    __ATM_ADV_START_PARAM_CONST atm_adv_start_t *start[CFG_GAP_ADV_MAX_INST];
+    __ATM_ADV_DATA_PARAM_CONST atm_adv_data_t *adv_data[CFG_GAP_ADV_MAX_INST];
+    __ATM_ADV_DATA_PARAM_CONST atm_adv_data_t *scan_data[CFG_GAP_ADV_MAX_INST];
     adv_create_t create_adv_idx;
     // act_idx managed by adv api so we don't know if it's just 0 or 1, need to hash it here
     uint8_t act_idx[CFG_GAP_ADV_MAX_INST];
