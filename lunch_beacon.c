@@ -207,8 +207,8 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
             ble_adv_create_cfm(act_idx, status);
         } break;
         case ATM_ADV_ADVDATA_DONE: {
-            // Start adv if we haven't already started
-            if(atm_asm_get_current_state(act_idx) == S_ADV_STARTED || GET_SCAN_DATA(act_idx)) break;
+            // Start adv if adv is off and theres no scan data
+            if(atm_adv_get_state(act_idx) != ATM_ADV_OFF || GET_SCAN_DATA(act_idx)) break;
             ret = atm_adv_start(activity_idx, GET_START_ADV(act_idx));
         } break;
         case ATM_ADV_SCANDATA_DONE: {
@@ -324,11 +324,12 @@ static void ble_create_lunch_adv(void)
 
     // TODO: Fetch 950 number here from nvds
     ATM_LOG(D, "Fetch 950 number here%s","");
-    ATM_LOG(D, "Act idx: %d", app_env.act_idx[IDX_LUNCH]);
 
     if(app_env.act_idx[IDX_LUNCH] != ATM_INVALID_ACTIDX) {
+        ATM_LOG(D, "starting adv");
         atm_adv_start(app_env.act_idx[IDX_LUNCH], app_env.start[IDX_LUNCH]);
     } else {
+        ATM_LOG(D, "creating adv");
         app_env.create_adv_idx = LUNCH_ADV_TYPE;
         atm_adv_create(app_env.create[IDX_LUNCH]); // adv_state_change (ATM_ADV_CREATED)
     }
