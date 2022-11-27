@@ -11,6 +11,7 @@ DRIVERS := \
 	atm_pm \
 	atm_gpio \
 	atm_button \
+	atm_vkey \
 	sw_event \
 
 LIBRARIES := prf
@@ -37,6 +38,7 @@ CFLAGS += \
 	-DCFG_NO_GAP_SCAN \
 	-DCFG_NO_GATTC \
 	-Wno-error=unused-function
+	-DPINMAP_$(BOARD)_OVERLAY="pinmap_$(BOARD)_overlay.h"
 
 # Predefined header adv stuff
 CFLAGS += \
@@ -46,8 +48,16 @@ CFLAGS += \
 	-DCFG_ADV_DATA_PARAM_CONST=0 \
 	-DCFG_GAP_ADV_MAX_INST=2 \
 	-DGAP_ADV_PARM_NAME="cfg_adv_params.h" \
-	-DGAP_PARM_NAME="cfg_gap_params.h"
+	-DGAP_PARM_NAME="cfg_gap_params.h" \
 
+# SRC
+SRC_TOP = src
+SRC_BT = src/bt
+SRC_NON_BT = src/non_bt
+INCLUDES += $(SRC_BT) $(SRC_NON_BT)
+C_SRCS += \
+	$(SRC_NON_BT)/lunch_button.c \
+	#$(SRC_BT)/lunch_gatt.c \
 
 include reference_beacons.mk
 flash_nvds.data := $(reference_beacon_$(REF_BCN)) $(if $(AUTO_RESTART),09-APP_BLE_RSTRT_DUR/500ms)

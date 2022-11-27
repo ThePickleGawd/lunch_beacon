@@ -12,8 +12,6 @@
 
 #pragma once
 
-#define PIN_BUTTON1_IO 10
-
 /// KEY action define
 typedef enum {
     LUNCH_BTN_TAP,
@@ -32,7 +30,7 @@ typedef void (*key_event_cb)(uint8_t idx, lunch_button_action_t key_action);
  *******************************************************************************
  * @brief Initial Button
  *
- * @param[in] cb  Callback function for key enevt (NULL for no callback)
+ * @param[in] cb  Callback function for key event (NULL for no callback)
  *******************************************************************************
  */
-void atts_btn_init(key_event_cb cb);
+void lunch_btn_init(key_event_cb cb);

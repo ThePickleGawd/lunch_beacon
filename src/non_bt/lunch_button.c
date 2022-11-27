@@ -70,11 +70,11 @@ void lunch_btn_init(key_event_cb cb)
 	VKEY_CLICK(btn_tap_handler, LUNCH_BTN1, BTN_TAP_HOLD_TIME_MS,
 	    BTN_TAP_HOLD_MAX_TIME_MS),
         VKEY_HOLD(btn_press_handler, hold_key_status_ind,
-	    BTN_LONG_PRESS_MIN_TIME_MS, (1 << ATTS_BTN1))
+	    BTN_LONG_PRESS_MIN_TIME_MS, (1 << LUNCH_BTN1))
     };
 
     static uint8_t const key_gpios[KEY_NUM] = {
-	PIN_BUTTON1_IO
+	10
     };
     atm_button_set_gpio(KEY_NUM, key_gpios);
     atm_button_reg(button_cb,

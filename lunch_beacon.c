@@ -20,9 +20,11 @@
 #include "atm_ble.h"
 #include "atm_adv_param.h"
 #include "atm_adv.h"
+#include "atm_button.h"
 
 // My stuff
 #include "lunch_beacon.h"
+#include "lunch_button.h"
 
 ATM_LOG_LOCAL_SETTING("Lunch Beacon", D);
 
@@ -38,6 +40,10 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
  * DEFINES
  *******************************************************************************
  */
+
+#ifndef PAIR_BUTTON_PIN
+#define PAIR_BUTTON_PIN 10
+#endif
 
 #define S_TBL_IDX 0
 
@@ -66,12 +72,20 @@ static uint8_t activity_idx = ATM_INVALID_ACTIDX;
  */
 static void adv_init_cfm(ble_err_code_t status)
 {
+    ATM_LOG(V, "%s", __func__);
+
     // Register adv state change callbacks
     atm_adv_reg(adv_state_change);
 
     // Set max transmit power
     atm_ble_set_txpwr_max(CFG_ADV0_CREATE_MAX_TX_POWER);
 
+    // Init act_idx to ATM_INVALID_ADVIDX(0xFF)
+    for (uint8_t idx = 0; idx < CFG_GAP_ADV_MAX_INST; idx++){
+        app_env.act_idx[idx] = ATM_INVALID_ADVIDX;
+    }
+
+    // Create adv
     atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
 } 
 
@@ -81,6 +95,8 @@ static void adv_init_cfm(ble_err_code_t status)
  */
 static void adv_conn_ind(uint8_t conidx, atm_connect_info_t *param)
 {
+    ATM_LOG(V, "%s", __func__);
+
     // Set max transmit power for given connection
     atm_ble_set_con_txpwr(conidx, CFG_ADV0_CREATE_MAX_TX_POWER);
 
@@ -96,6 +112,8 @@ static void adv_conn_ind(uint8_t conidx, atm_connect_info_t *param)
  */
 static void adv_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
 {
+    ATM_LOG(V, "%s", __func__);
+
     atm_asm_move(S_TBL_IDX, OP_DISCONNECTED);
 }
 
@@ -105,6 +123,8 @@ static void adv_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
  */
 static void adv_phy_ind(uint8_t conidx, ble_gap_le_phy_t const *param)
 {
+    ATM_LOG(V, "%s", __func__);
+
     ATM_LOG(D, "%s: conidx=%d rx_phy=%d tx_phy=%d", __func__, conidx,
 	param->rx_phy, param->tx_phy);
 }
@@ -122,6 +142,27 @@ static const atm_gap_cbs_t gap_callbacks = {
  *******************************************************************************
  */
 
+static void button_cb(uint8_t idx, lunch_button_action_t key_action)
+{
+    ATM_LOG(V, "%s: idx:%d, %d", __func__, idx, key_action);
+    switch (key_action) {
+	case LUNCH_BTN_TAP: {
+	    ATM_LOG(D, "btn%d clicked", idx);
+	} break;
+
+	case LUNCH_BTN_PRESS: {
+        ATM_LOG(D, "btn%d pressed", idx);
+        ATM_LOG(D, "Current state is %d", atm_asm_get_current_state(S_TBL_IDX));
+
+	    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
+	} break;
+
+	default: {
+	    ATM_LOG(W, "unhandle key(%d)action(%d)", idx, key_action);
+	} break;
+    }
+}
+
 static uint8_t act_to_idx(uint8_t act_idx)
 {
     for (uint8_t idx = 0; idx < CFG_GAP_ADV_MAX_INST; idx++) {
@@ -137,7 +178,7 @@ static uint8_t act_to_idx(uint8_t act_idx)
 // BLE create confirmation
 static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
 {
-    ATM_LOG(D, "%s", __func__);
+    ATM_LOG(V, "%s", __func__);
 
     ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
     activity_idx = act_idx;
@@ -190,6 +231,8 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
  */
 static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_code_t status)
 {
+    ATM_LOG(V, "%s", __func__);
+
     ble_err_code_t ret = BLE_ERR_NO_ERROR;
 
     ATM_LOG(D, "adv_state = %d", state);
@@ -253,6 +296,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
  */
 static void ble_init(void)
 {
+    ATM_LOG(V, "%s", __func__);
     // Create gatt profile
     ATM_LOG(W, "TODO: Create Gatt Profile (in another file)%s", "");
     //atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL)
@@ -267,6 +311,7 @@ static void ble_init(void)
  */
 static void ble_start_on(void)
 {
+    ATM_LOG(V, "%s", __func__);
     atm_asm_set_state_op(S_TBL_IDX, S_ADV_STARTED, OP_END);
 }
 
@@ -277,6 +322,7 @@ static void ble_start_on(void)
  */
 static void ble_connected(void)
 {
+    ATM_LOG(V, "%s", __func__);
     atm_asm_set_state_op(S_TBL_IDX, S_CONNECTED, OP_END);
 }
 
@@ -286,6 +332,7 @@ static void ble_connected(void)
  */
 static void ble_disconnected(void)
 {
+    ATM_LOG(V, "%s", __func__);
     atm_asm_move(S_TBL_IDX, OP_RESTART_ADV);
 }
 
@@ -295,6 +342,8 @@ static void ble_disconnected(void)
  */
 static void ble_timeout(void)
 {
+    ATM_LOG(V, "%s", __func__);
+
     atm_pm_unlock(adv_lock_hiber);
 
     // TODO: this is where I'd set a sw_timer to restart
@@ -308,6 +357,8 @@ static void ble_timeout(void)
  */
 static void ble_restart_adv(void)
 {
+    ATM_LOG(V, "%s", __func__);
+
     ble_err_code_t ret = atm_adv_start(activity_idx, GET_START_ADV(activity_idx));
     if (ret != BLE_ERR_NO_ERROR) {
 	    ATM_LOG(E, "%s: Failed to restart adv with status %#x", __func__, ret);
@@ -316,6 +367,7 @@ static void ble_restart_adv(void)
 
 static void ble_create_lunch_adv(void)
 {
+    ATM_LOG(V, "%s", __func__);
     ATM_LOG(D, "Creating lunch adv%s","");
 
     // Fetch params
@@ -337,6 +389,8 @@ static void ble_create_lunch_adv(void)
 
 static void ble_create_pair_adv(void)
 {
+    ATM_LOG(V, "%s", __func__);
+    
     // Fetch params
     app_env.create[IDX_PAIR_ADV] = atm_adv_create_param_get(IDX_PAIR_ADV);
     app_env.start[IDX_PAIR_ADV] = atm_adv_start_param_get(IDX_PAIR_ADV);
@@ -347,6 +401,7 @@ static void ble_create_pair_adv(void)
 
 static void ble_delete_pair_adv(void)
 {
+    ATM_LOG(V, "%s", __func__);
     ATM_LOG(D, "Delete Pairing ADV%s", "");
     atm_adv_delete(app_env.act_idx[IDX_PAIR_ADV]);
 }
@@ -363,12 +418,12 @@ static const state_entry s_tbl[] = {
     {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, ble_create_lunch_adv},
     // Create pairing beacon
     {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, ble_create_pair_adv},
-    // Delete the pairing beacon
-    {S_OP(S_STARTING_PAIR_ADV, OP_DELETE_PAIR_ADV), S_IDLE, ble_delete_pair_adv},
     // Start the lunch beacon after receiving confirmation
     {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, ble_start_on},
     // Start the pairing beacon after receiving confirmation
     {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, ble_start_on},
+    // Delete the pairing beacon
+    {S_OP(S_ADV_STARTED, OP_DELETE_PAIR_ADV), S_IDLE, ble_delete_pair_adv},
     
     // Handle connections, timeouts, restarts
     {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, ble_connected},
@@ -394,6 +449,10 @@ static rep_vec_err_t user_appm_init(void)
     adv_lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
     atm_pm_lock(adv_lock_hiber);
 
+    // Initialize button
+    lunch_btn_init(button_cb);
+
+    // Initialize state machine
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));
     atm_asm_set_state_op(S_TBL_IDX, S_INIT, OP_END);
     atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
