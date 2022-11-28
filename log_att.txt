@@ -2,41 +2,62 @@
 @00000097 APP Version: 0.0.0.9
 5x5 Stacked flash: 4e 56 44 53 05 06 03 50 46 00 06 06 27 00 00 00 ...
 @0000020f boot_status = 1000000
-@00000270 Cold boot
+@0000026f Cold boot
 @000002dc [BLE_att_se][D]: user_appm_init:
-@0000037c [BLE_att_se][D]: app_init: con_max:5, att_server:5
-@00000451 [ atts_gatt][D]: atts_create_prf:
-@00000525 [ atts_gatt][D]: atts_create_prf: svc1 (0), RW1 (2), NT1 (4) NT_CCCD1 (5)
-@00000640 [ atts_gatt][D]: atts_create_prf: svc2 (6), IND2 (8) NT_CCCD2 (9)
-@00000741 [ atts_gatt][D]: atts_create_prf: svc3 (10), RW3 (12), CUDD3 (13)
-@00000856 [ atts_gatt][D]: atts_create_prf: SVC_ECHO(17), RW_ECHO(19), NT_ECHO(21), NT_CCCD_ECHO(22)
-@000009cb [ble_gap_se][N]: BOND MASK : 0
-@00000b44 [  atm_prfs][V]: atm_prfs_init:
-@00000c25 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (0), start_hdl (11), attr_num (6)
-@00000d81 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (1), start_hdl (17), attr_num (4)
-@00000f06 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (2), start_hdl (21), attr_num (7)
-@00001076 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (3), start_hdl (28), attr_num (6)
-@000011b2 [BLE_att_se][D]: gap_init_cfm: status: 0
-@00001269 [BLE_att_se][D]: app_create_adv:
-@0000130c [BLE_att_se][D]: app_create_adv: adv_param.prop (3)
-@00001404 [BLE_att_se][D]: adv_create_cfm: status: 0
-@000014e4 [BLE_att_se][D]: ATM_ADV_DATA_DONE
-@00001586 [BLE_att_se][D]: app_start_adv:
-@00001624 Optimize HW Scan: Active=1
-@000016af [BLE_att_se][D]: unhandle adv_state = 6
-@00001778 [   atm_adv][D]: Adv0: ON
-@00001802 [BLE_att_se][D]: ATM_ADV_ON: Wait for connection
-@0001c078 [  atm_prfs][V]: atm_prfs_create: conidx (0), task (10), id (118)
-@0001c191 [BLE_att_se][D]: gap_conn_ind:
-@0001c230 [BLE_att_se][D]: app_connected:
-@0001c2cf [   atm_gap][D]: ConnInd idx=0 role=S
-@0001c38d Restore HW Scan
-@0001c3dd [   atm_adv][D]: Adv0: OFF (0)
-@0001c479 [BLE_att_se][D]: ATM_ADV_OFF
-@0001c50f [BLE_att_se][D]: app_start_adv:
-@0001c5af Optimize HW Scan: Active=1
-@0001c650 [   atm_gap][W]: miss cb le_pkt_size
-@0001c706 [   atm_adv][D]: Adv0: ON
-@0001c793 [BLE_att_se][D]: ATM_ADV_ON: Wait for connection
-@0001fa7b [   atm_gap][W]: miss cb phy
-@0002ffd6 porting_gapc_get_dev_info_cfm: name len=19
+@0000037b [BLE_att_se][D]: app_init: con_max:5, att_server:5
+@00000450 [ atts_gatt][D]: atts_create_prf:
+@000004f7 [ble_atmprf][V]: ble_atmprfs_add_svc:
+@000005a9 [ble_atmprf][V]: ble_atmprfs_add_char:
+@0000065f [ble_atmprf][V]: ble_atmprfs_add_char:
+@00000712 [ble_atmprf][V]: ble_atmprfs_add_client_char_cfg:
+@000007e2 [ble_atmprf][V]: ble_atmprfs_add_svc:
+@00000893 [ble_atmprf][V]: ble_atmprfs_add_char:
+@00000946 [ble_atmprf][V]: ble_atmprfs_add_client_char_cfg:
+@00000a16 [ble_atmprf][V]: ble_atmprfs_add_svc:
+@00000ac6 [ble_atmprf][V]: ble_atmprfs_add_char:
+@00000b7a [ble_atmprf][V]: ble_atmprfs_add_char_user_desc:
+@00000c48 [ble_atmprf][V]: ble_atmprfs_add_char:
+@00000cfd [ atts_gatt][D]: atts_create_prf: svc1 (0), RW1 (2), NT1 (4) NT_CCCD1 (5)
+@00000e17 [ atts_gatt][D]: atts_create_prf: svc2 (6), IND2 (8) NT_CCCD2 (9)
+@00000f17 [ atts_gatt][D]: atts_create_prf: svc3 (10), RW3 (12), CUDD3 (13)
+@0000101c [ble_atmprf][V]: ble_atmprfs_add_svc:
+@000010ce [ble_atmprf][V]: ble_atmprfs_add_char:
+@00001182 [ble_atmprf][V]: ble_atmprfs_add_char:
+@00001234 [ble_atmprf][V]: ble_atmprfs_add_client_char_cfg:
+@00001304 [ atts_gatt][D]: atts_create_prf: SVC_ECHO(17), RW_ECHO(19), NT_ECHO(21), NT_CCCD_ECHO(22)
+@00001478 [ble_gap_se][N]: BOND MASK : 0
+@00001513 [ble_atmprf][V]: ble_atmprfs_init_op:
+@00001696 [ble_atmprf][V]: ble_atmprfs_start_op:
+@0000174e [  atm_prfs][V]: atm_prfs_init:
+@000017f6 [ble_atmprf][V]: ble_atmprfs_active_service_from_start_op:
+@000018de [ble_atmprf][V]: ble_atmprfs_active_svc_db:
+@000019d4 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (0), start_hdl (11), attr_num (6)
+@00001b2f [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (1), start_hdl (17), attr_num (4)
+@00001cb4 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (2), start_hdl (21), attr_num (7)
+@00001e25 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (3), start_hdl (28), attr_num (6)
+@00001f61 [BLE_att_se][D]: gap_init_cfm: status: 0
+@00002018 [BLE_att_se][D]: app_create_adv:
+@000020bb [BLE_att_se][D]: app_create_adv: adv_param.prop (3)
+@000021b2 [BLE_att_se][D]: adv_create_cfm: status: 0
+@00002292 [BLE_att_se][D]: ATM_ADV_DATA_DONE
+@00002334 [BLE_att_se][D]: app_start_adv:
+@000023d1 Optimize HW Scan: Active=1
+@0000245d [BLE_att_se][D]: unhandle adv_state = 6
+@00002525 [   atm_adv][D]: Adv0: ON
+@000025b0 [BLE_att_se][D]: ATM_ADV_ON: Wait for connection
+@00057f5c [  atm_prfs][V]: atm_prfs_create: conidx (0), task (10), id (118)
+@00058076 [BLE_att_se][D]: gap_conn_ind:
+@00058115 [BLE_att_se][D]: app_connected:
+@000581b4 [   atm_gap][D]: ConnInd idx=0 role=S
+@0005826b Restore HW Scan
+@000582bc [   atm_adv][D]: Adv0: OFF (0)
+@00058358 [BLE_att_se][D]: ATM_ADV_OFF
+@000583ed [BLE_att_se][D]: app_start_adv:
+@0005848e Optimize HW Scan: Active=1
+@0005850f [ble_atmprf][V]: ble_atmprfs_msg_dflt_handler: unhandled msgid 0xe01 from 0xff
+@00058658 [   atm_adv][D]: Adv0: ON
+@000586e4 [BLE_att_se][D]: ATM_ADV_ON: Wait for connection
+@00058e7a [   atm_gap][W]: miss cb le_pkt_size
+@0005bc58 [   atm_gap][W]: miss cb phy
+@0005c449 [ble_atmprf][V]: ble_atmprfs_msg_dflt_handler: unhandled msgid 0xc02 from 0xff
+@0006c58b porting_gapc_get_dev_info_cfm: name len=19

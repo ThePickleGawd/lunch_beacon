@@ -111,7 +111,7 @@ static void gap_conn_ind(uint8_t conidx, atm_connect_info_t *param)
     // Accept connection and update state
     atm_gap_print_conn_param(param);
     atm_gap_connect_accept(conidx);
-    atm_gap_get_link_info(conidx, BLE_GAP_GET_PHY);
+    // atm_gap_get_link_info(conidx, BLE_GAP_GET_PHY);
     atm_asm_move(S_TBL_IDX, OP_CONNECTED);
 }
 
@@ -313,7 +313,7 @@ static void ble_init(void)
     
     // Create gatt profile
     lunch_atts_create_prf();
-    atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL);
+    atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL); 
 
     // Start gap
     atm_gap_start(atm_gap_param_get(), &gap_callbacks);

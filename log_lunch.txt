@@ -1,41 +1,50 @@
 @00000040 SDK Version: 5.3.0
-@0000009b APP Version: 0.0.0.9
+@0000009c APP Version: 0.0.0.9
 5x5 Stacked flash: 4e 56 44 53 01 06 06 c9 00 00 6b 69 7c 11 06 01 ...
-@0000020b boot_status = 1000000
-@0000026b Cold boot
-@000002aa [Lunch Beac][D]: user_main() done
-@00000389 [lunch_butt][V]: Button init!!
-@00000422 [lunch_gatt][D]: lunch_atts_create_prf:
-@000004e8 [lunch_gatt][D]: lunch_atts_create_prf: SVC (0), RW_STUDENT_ID (2), RW_SCHOOL_ID (4) CCCD (5)
-@000006ed [  atm_prfs][V]: atm_prfs_init:
-@000007cd [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (0), start_hdl (11), attr_num (6)
-@00026977 [lunch_butt][V]: btn_tap_handler: key 0 tap 43 ms
-@00026a4e [Lunch Beac][D]: btn0 clicked
-@0006f9d5 [lunch_butt][V]: btn_tap_handler: key 0 tap 10 ms
-@0006faab [Lunch Beac][D]: btn0 clicked
-@0008055f [lunch_butt][V]: btn_press_handler: key_mask 0x1, press 2000 ms
-@00080663 [Lunch Beac][D]: btn0 pressed
-@000806fb [Lunch Beac][D]: Current state is 1
-@000807ca [Lunch Beac][D]: adv_state = 2
-@00080864 [Lunch Beac][D]: ATM_ADV_CREATED act_idx=0
-@00080926 [   atm_adv][D]: no path to update vaid
-@000809f8 [Lunch Beac][D]: adv_state = 4
-@00080aa6 [Lunch Beac][D]: adv_state = 6
-@00080b42 Optimize HW Scan: Active=1
-@00080bd1 [   atm_adv][D]: Adv0: ON
-@00080c5f [Lunch Beac][D]: adv_state = 9
-@000b1a42 [  atm_prfs][V]: atm_prfs_create: conidx (0), task (10), id (118)
-@000b1b5c [Lunch Beac][D]: TODO: Reject connection if we already have one
-@000b1c57 [   atm_gap][D]: + Peer (1) 65:74:CC:45:A6:9D
-@000b1d29 [   atm_gap][D]: + Interval +    24 (unit:1.25ms)
-@000b1dfd [   atm_gap][D]: + Latency  +     0
-@000b1ea6 [   atm_gap][D]: + SupTO +    72 (unit:10ms)
-@000b1f76 [   atm_gap][D]: ConnInd idx=0 role=S
-@000b202d Restore HW Scan
-@000b207d [   atm_adv][D]: Adv0: OFF (0)
-@000b211a [Lunch Beac][D]: adv_state = 7
-@000b21d5 [   atm_gap][E]: miss cb linfo
-@000b2b51 [   atm_gap][W]: miss cb le_pkt_size
-@000b5d00 [Lunch Beac][D]: gap_phy_ind: conidx=0 rx_phy=2 tx_phy=2
-@000b610e ble_msg_handler - Unhandled msgid 0xc02 from 0x7
-@000c6638 porting_gapc_get_dev_info_cfm: name len=15
+@0000020d boot_status = 1000000
+@0000026d Cold boot
+@000002ac [Lunch Beac][D]: user_main() done
+@0000038b [lunch_butt][V]: Button init!!
+@00000423 [lunch_gatt][D]: lunch_atts_create_prf:
+@000004d8 [ble_atmprf][V]: ble_atmprfs_add_svc:
+@0000058b [ble_atmprf][V]: ble_atmprfs_add_char:
+@00000640 [ble_atmprf][V]: ble_atmprfs_add_char:
+@000006f2 [ble_atmprf][V]: ble_atmprfs_add_client_char_cfg:
+@000007c2 [lunch_gatt][D]: lunch_atts_create_prf: SVC (0), RW_STUDENT_ID (2), RW_SCHOOL_ID (4) CCCD (5)
+@00000920 [ble_atmprf][V]: ble_atmprfs_init_op:
+@00000a69 [ble_atmprf][V]: ble_atmprfs_start_op:
+@00000b21 [  atm_prfs][V]: atm_prfs_init:
+@00000bc8 [ble_atmprf][V]: ble_atmprfs_active_service_from_start_op:
+@00000cb0 [ble_atmprf][V]: ble_atmprfs_active_svc_db:
+@00000da6 [ble_atmprf][N]: ble_atmprfs_active_svc_db: svc_idx (0), start_hdl (11), attr_num (6)
+@00046a48 [lunch_butt][V]: btn_tap_handler: key 0 tap 118 ms
+@00046b24 [Lunch Beac][D]: btn0 clicked
+@00046dc3 [lunch_butt][V]: btn_tap_handler: key 0 tap 16 ms
+@00046e9a [Lunch Beac][D]: btn0 clicked
+@00056f3d [lunch_butt][V]: btn_press_handler: key_mask 0x1, press 2000 ms
+@00057041 [Lunch Beac][D]: btn0 pressed
+@000570d8 [Lunch Beac][D]: Current state is 1
+@000571a8 [Lunch Beac][D]: adv_state = 2
+@00057241 [Lunch Beac][D]: ATM_ADV_CREATED act_idx=0
+@00057304 [   atm_adv][D]: no path to update vaid
+@000573d7 [Lunch Beac][D]: adv_state = 4
+@00057485 [Lunch Beac][D]: adv_state = 6
+@00057522 Optimize HW Scan: Active=1
+@000575b0 [   atm_adv][D]: Adv0: ON
+@0005763f [Lunch Beac][D]: adv_state = 9
+@0006857b [  atm_prfs][V]: atm_prfs_create: conidx (0), task (10), id (118)
+@00068695 [Lunch Beac][D]: TODO: Reject connection if we already have one
+@00068790 [   atm_gap][D]: + Peer (1) 58:D7:DC:98:DA:DE
+@00068862 [   atm_gap][D]: + Interval +    24 (unit:1.25ms)
+@00068936 [   atm_gap][D]: + Latency  +     0
+@000689df [   atm_gap][D]: + SupTO +    72 (unit:10ms)
+@00068aaf [   atm_gap][D]: ConnInd idx=0 role=S
+@00068b6c Restore HW Scan
+@00068bbc [   atm_adv][D]: Adv0: OFF (0)
+@00068c59 [Lunch Beac][D]: adv_state = 7
+@00068d0a [ble_atmprf][V]: ble_atmprfs_msg_dflt_handler: unhandled msgid 0xe01 from 0xff
+@00068e47 [   atm_gap][W]: miss cb le_pkt_size
+@00068efe [   atm_gap][E]: miss cb linfo
+@0006bf56 [Lunch Beac][D]: gap_phy_ind: conidx=0 rx_phy=2 tx_phy=2
+@0006c35d ble_msg_handler - Unhandled msgid 0xc02 from 0x7
+@0007c888 porting_gapc_get_dev_info_cfm: name len=15

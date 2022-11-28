@@ -32,6 +32,7 @@
  */
 
 #define CFG_ADV1_CREATE_PROPERTY ADV_LEGACY_UNDIR_CONN_MASK
+#define CFG_ADV1_START_DURATION 3000 // 30s (unit of 10ms)
 
 #define CFG_ADV1_DATA_ADV_PAYLOAD \
     /* Complete service list: */ \

@@ -8,8 +8,6 @@ endif
 reference_beacon_blank := \
 	01-BD_ADDRESS/beacon_201 \
 	11-SLEEP_ENABLE/ret_drop \
-	05-APP_BLE_ACT_STRT_CMD/180s_adv \
-	06-APP_BLE_ACT_CRT_CMD/legacy_nc_s_100ms \
 	11-SLEEP_ENABLE/ret_drop \
 	12-EXT_WAKEUP_ENABLE/enable \
 
