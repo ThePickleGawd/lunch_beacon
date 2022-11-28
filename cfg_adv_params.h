@@ -33,6 +33,10 @@
 
 #define CFG_ADV1_CREATE_PROPERTY ADV_LEGACY_UNDIR_CONN_MASK
 
+#define CFG_ADV1_DATA_ADV_PAYLOAD \
+    /* Complete service list: */ \
+    0x03, 0x03, 0x15, 0x18
+
 // Same scan response as Adv0
 #define CFG_ADV1_DATA_SCANRSP_PAYLOAD \
     CFG_ADV0_DATA_SCANRSP_PAYLOAD

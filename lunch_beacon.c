@@ -25,6 +25,7 @@
 // My stuff
 #include "lunch_beacon.h"
 #include "lunch_button.h"
+#include "lunch_gatt.h"
 
 ATM_LOG_LOCAL_SETTING("Lunch Beacon", D);
 
@@ -70,7 +71,7 @@ static uint8_t activity_idx = ATM_INVALID_ACTIDX;
  * @brief Callback registered with the GAP layer
  * @note Called after the GAP layer has initialized
  */
-static void adv_init_cfm(ble_err_code_t status)
+static void gap_init_cfm(ble_err_code_t status)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -86,20 +87,28 @@ static void adv_init_cfm(ble_err_code_t status)
     }
 
     // Create adv
-    atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
+    //atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
 } 
 
 /*
  * @brief Callback registered with the GAP layer
  * @note Called after a connection has been established
  */
-static void adv_conn_ind(uint8_t conidx, atm_connect_info_t *param)
+static void gap_conn_ind(uint8_t conidx, atm_connect_info_t *param)
 {
     ATM_LOG(V, "%s", __func__);
+
+    if(app_env.create_adv_idx != PAIR_ADV_TYPE) {
+        ATM_LOG(E, "Connection established but it's not from pair adv?");
+        return;
+    }
+
+    ATM_LOG(D, "TODO: Reject connection if we already have one");
 
     // Set max transmit power for given connection
     atm_ble_set_con_txpwr(conidx, CFG_ADV0_CREATE_MAX_TX_POWER);
 
+    // Accept connection and update state
     atm_gap_print_conn_param(param);
     atm_gap_connect_accept(conidx);
     atm_gap_get_link_info(conidx, BLE_GAP_GET_PHY);
@@ -110,7 +119,7 @@ static void adv_conn_ind(uint8_t conidx, atm_connect_info_t *param)
  * @brief Callback registered with the GAP layer
  * @note Called after the device has been disconnected
  */
-static void adv_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
+static void gap_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -121,7 +130,7 @@ static void adv_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
  * @brief Callback registered with the GAP layer
  * @note Called after the PHY mode has been updated
  */
-static void adv_phy_ind(uint8_t conidx, ble_gap_le_phy_t const *param)
+static void gap_phy_ind(uint8_t conidx, ble_gap_le_phy_t const *param)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -131,10 +140,10 @@ static void adv_phy_ind(uint8_t conidx, ble_gap_le_phy_t const *param)
 
 // GAP callbacks
 static const atm_gap_cbs_t gap_callbacks = {
-    .init_cfm = adv_init_cfm,
-    .conn_ind = adv_conn_ind,
-    .disc_ind = adv_disc_ind,
-    .phy_ind = adv_phy_ind,
+    .init_cfm = gap_init_cfm,
+    .conn_ind = gap_conn_ind,
+    .disc_ind = gap_disc_ind,
+    .phy_ind = gap_phy_ind,
 };
 
 /*
@@ -175,7 +184,10 @@ static uint8_t act_to_idx(uint8_t act_idx)
     return 0;
 }
 
-// BLE create confirmation
+/**
+ * @brief Load adv and scan parameters and set them into GAP layer.
+ * @note Called when the advertisement activity is created.
+ */
 static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
 {
     ATM_LOG(V, "%s", __func__);
@@ -217,7 +229,8 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     }
 
     if(!app_env.scan_data[idx] && !app_env.adv_data[idx]) {
-        ble_err_code_t ret = atm_adv_start(activity_idx, GET_START_ADV(idx));
+        ATM_LOG(E, "CALLED HERERLKEJR:LSKDJFL:SDKJ");
+        ble_err_code_t ret = atm_adv_start(activity_idx, app_env.start[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Failed to start adv with status %#x", __func__, ret);
 	        return;
@@ -297,9 +310,10 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 static void ble_init(void)
 {
     ATM_LOG(V, "%s", __func__);
+    
     // Create gatt profile
-    ATM_LOG(W, "TODO: Create Gatt Profile (in another file)%s", "");
-    //atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL)
+    lunch_atts_create_prf();
+    atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL);
 
     // Start gap
     atm_gap_start(atm_gap_param_get(), &gap_callbacks);

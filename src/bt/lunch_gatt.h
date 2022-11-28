@@ -20,6 +20,7 @@ enum atts_attr_idx {
     ATTS_SVC_LUNCH,
     ATTS_CHAR_RW_STUDENT_ID,
     ATTS_CHAR_RW_SCHOOL_ID,
+    ATTS_CHAR_CCCD,
 
     ATTS_ATTR_NUM
 };
@@ -36,3 +37,10 @@ enum atts_attr_idx {
     0xA0, 0xA0, 0xA0, 0xA0, 0xA0, 0xA0, 0xA0, 0xA1
 #define CHAR_SCHOOL_ID_UUID 0xB0, 0xB0, 0xB0, 0xB0, 0xB0, 0xB0, 0xB0, 0xB0, \
     0xB0, 0xB0, 0xB0, 0xB0, 0xB0, 0xB0, 0xB0, 0xB0
+
+/**
+ *******************************************************************************
+ * @brief Create application specific gatt service
+ *******************************************************************************
+ */
+void lunch_atts_create_prf(void);
