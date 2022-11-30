@@ -6,6 +6,7 @@ supply_bd_addr := 01-BD_ADDRESS/beacon_201
 endif
 
 reference_beacon_blank := \
+	d0-LUNCH_DATA/default \
 	# 01-BD_ADDRESS/beacon_201 \
 	# 11-SLEEP_ENABLE/ret_drop \
 	# 12-EXT_WAKEUP_ENABLE/enable \

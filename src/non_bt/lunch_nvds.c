@@ -35,3 +35,29 @@ uint8_t nvds_put_lunch_data(nvds_lunch_data_t *data)
 
     return err;
 }
+
+uint8_t nvds_put_school_data(uint8_t const *school_data)
+{
+    // Get current lunch data
+    nvds_lunch_data_t data = {};
+    nvds_get_lunch_data(&data);
+
+    // Modify school id
+    memcpy(data.school_id, school_data, SCHOOL_ID_ARR_LEN);
+
+    // Write back to nvds
+    return nvds_put_lunch_data(&data);
+}
+
+uint8_t nvds_put_student_data(uint8_t const *student_data)
+{
+    // Get current lunch data
+    nvds_lunch_data_t data = {};
+    nvds_get_lunch_data(&data);
+
+    // Modify student id
+    memcpy(data.student_id, student_data, STUDENT_ID_ARR_LEN);
+
+    // Write back to nvds
+    return nvds_put_lunch_data(&data);
+}

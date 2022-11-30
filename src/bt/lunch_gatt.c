@@ -23,6 +23,7 @@
 #endif
 
 #include "lunch_gatt.h"
+#include "lunch_nvds.h"
 
 ATM_LOG_LOCAL_SETTING("lunch_gatt", V);
 
@@ -32,6 +33,22 @@ ATM_LOG_LOCAL_SETTING("lunch_gatt", V);
  */
 
 static uint8_t atts_attr_handle[ATTS_ATTR_NUM];
+
+/*
+ * DATA PARSER
+ *******************************************************************************
+ */
+static void try_write_lunch_data(uint8_t const *data, uint8_t len, uint8_t desired_len)
+{
+	if(len != desired_len) {
+		ATM_LOG(W, "Cannot parse school id: len %d is not equal to %d", (int)len, (int)desired_len);
+		return;
+	}
+
+	// TODO: Add some more checks, like ascii characters only?
+
+	nvds_put_student_data(data);
+}
 
 /*
  * SERVICE CALLBACKS
@@ -62,6 +79,13 @@ static uint8_t atts_write_req(uint8_t conidx, uint8_t att_idx, uint8_t const *da
 	ATM_LOG(D, "%s: conidx(%d) att_idx (%d)", __func__, conidx, att_idx);
 	ATM_LOG(D, "Write request: %s", data);
 
+	// Try to write data to respective spot
+	if(att_idx == atts_attr_handle[ATTS_CHAR_RW_SCHOOL_ID]) {
+		try_write_lunch_data(data, len, SCHOOL_ID_ARR_LEN);
+	} else if (att_idx == atts_attr_handle[ATTS_CHAR_RW_STUDENT_ID]) {
+		try_write_lunch_data(data, len, STUDENT_ID_ARR_LEN);
+	}
+
 	return ATT_ERR_NO_ERROR;
 }
 
@@ -79,12 +103,6 @@ ble_atmprfs_cbs_t const atmprfs_cbs = {
 	.write_req = atts_write_req,
 	.write_cfm = atts_write_cfm,
 };
-
-/*
- * STATIC FUNCTIONS
- *******************************************************************************
- */
-
 
 /*
  * GLOBAL FUNCTIONS

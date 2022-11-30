@@ -160,6 +160,15 @@ static void button_cb(uint8_t idx, lunch_button_action_t key_action)
     switch (key_action) {
 	case LUNCH_BTN_TAP: {
 	    ATM_LOG(D, "btn%d clicked", idx);
+        ATM_LOG(W, "tmp code here ;lsdkfjsldkfjsl;dkjf ahhhhhh");
+        // Fetch lunch data for adv params
+        nvds_lunch_data_t lunch_data = {
+            .school_id = {},
+            .student_id = {}
+        };
+
+        nvds_get_lunch_data(&lunch_data);
+        ATM_LOG(D, "student id is %s", lunch_data.student_id);
 	} break;
 
 	case LUNCH_BTN_PRESS: {
@@ -207,16 +216,24 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     app_env.adv_data[idx] = atm_adv_advdata_param_get(idx);
     app_env.scan_data[idx] = atm_adv_scandata_param_get(idx);
 
-    // Fetch lunch data for adv params
-    nvds_lunch_data_t *lunch_data = 0;
-    uint8_t err = nvds_get_lunch_data(lunch_data);
-    if(err == NVDS_OK) {
-        // TODO: Update 950 number in adv param
+    if (idx == IDX_LUNCH) {
+        // Fetch lunch data for adv params
+        nvds_lunch_data_t lunch_data = {
+            .school_id = {},
+            .student_id = {}
+        };
 
-        memcpy(app_env.adv_data, (uint8_t *) lunch_data, ADV_LUNCH_DATA_IDX);
-    } else {
-        ATM_LOG(E, "%s - Could not fetch lunch data. Err = %d", __func__, err);
-        return;
+        uint8_t err = nvds_get_lunch_data(&lunch_data);
+        if(err == NVDS_OK) {
+            // TODO: Update 950 number in adv param
+            memcpy(app_env.adv_data, (uint8_t *) &lunch_data, ADV_LUNCH_DATA_IDX);
+            ATM_LOG(D, "Found Lunch Data - School ID: %s - Student ID: %s", 
+                lunch_data.school_id,
+                lunch_data.student_id);
+        } else {
+            ATM_LOG(E, "%s - Could not fetch lunch data. Err = %d", __func__, err);
+            return;
+        }
     }
 
     {
