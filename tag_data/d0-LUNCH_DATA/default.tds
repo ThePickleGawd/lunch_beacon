@@ -1,0 +1,5 @@
+# School ID (6 bytes)
+00 00 00 00 00 00
+
+# Student ID (10 bytes)
+00 00 00 00 00 00 00 00 00 00

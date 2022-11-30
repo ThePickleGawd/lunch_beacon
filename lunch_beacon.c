@@ -26,8 +26,9 @@
 #include "lunch_beacon.h"
 #include "lunch_button.h"
 #include "lunch_gatt.h"
+#include "lunch_nvds.h"
 
-ATM_LOG_LOCAL_SETTING("Lunch Beacon", D);
+ATM_LOG_LOCAL_SETTING("lunch_beacon", D);
 
 /*
  * FUNCTION DECLARATIONS
@@ -52,6 +53,8 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 #define GET_START_ADV(act_idx) (app_env.start[act_to_idx(act_idx)])
 #define GET_ADV_DATA(act_idx) (app_env.adv_data[act_to_idx(act_idx)])
 #define GET_SCAN_DATA(act_idx) (app_env.scan_data[act_to_idx(act_idx)])
+
+#define ADV_LUNCH_DATA_IDX 4
 
 /*
  * VARIABLES
@@ -204,6 +207,18 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     app_env.adv_data[idx] = atm_adv_advdata_param_get(idx);
     app_env.scan_data[idx] = atm_adv_scandata_param_get(idx);
 
+    // Fetch lunch data for adv params
+    nvds_lunch_data_t *lunch_data = 0;
+    uint8_t err = nvds_get_lunch_data(lunch_data);
+    if(err == NVDS_OK) {
+        // TODO: Update 950 number in adv param
+
+        memcpy(app_env.adv_data, (uint8_t *) lunch_data, ADV_LUNCH_DATA_IDX);
+    } else {
+        ATM_LOG(E, "%s - Could not fetch lunch data. Err = %d", __func__, err);
+        return;
+    }
+
     {
         ble_err_code_t ret = atm_adv_set_data_sanity(app_env.create[idx], app_env.adv_data[idx], app_env.scan_data[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
@@ -229,7 +244,6 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     }
 
     if(!app_env.scan_data[idx] && !app_env.adv_data[idx]) {
-        ATM_LOG(E, "CALLED HERERLKEJR:LSKDJFL:SDKJ");
         ble_err_code_t ret = atm_adv_start(activity_idx, app_env.start[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Failed to start adv with status %#x", __func__, ret);
@@ -387,9 +401,6 @@ static void ble_create_lunch_adv(void)
     // Fetch params
     app_env.create[IDX_LUNCH] = atm_adv_create_param_get(IDX_LUNCH);
     app_env.start[IDX_LUNCH] = atm_adv_start_param_get(IDX_LUNCH);
-
-    // TODO: Fetch 950 number here from nvds
-    ATM_LOG(D, "Fetch 950 number here%s","");
 
     if(app_env.act_idx[IDX_LUNCH] != ATM_INVALID_ACTIDX) {
         ATM_LOG(D, "starting adv");

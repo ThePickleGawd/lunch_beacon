@@ -57,6 +57,7 @@ SRC_NON_BT = src/non_bt
 INCLUDES += $(SRC_BT) $(SRC_NON_BT)
 C_SRCS += \
 	$(SRC_NON_BT)/lunch_button.c \
+	$(SRC_NON_BT)/lunch_nvds.c \
 	$(SRC_BT)/lunch_gatt.c \
 
 include reference_beacons.mk
