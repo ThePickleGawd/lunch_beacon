@@ -15,6 +15,7 @@
 #include "nvds_tag.h"
 #include <inttypes.h>
 #include "atm_log.h"
+#include "co_utils.h"
 
 ATM_LOG_LOCAL_SETTING("lunch_nvds", D);
 

@@ -35,9 +35,12 @@
 #define CFG_ADV1_START_DURATION 3000 // 30s (unit of 10ms)
 
 #define CFG_ADV1_DATA_ADV_PAYLOAD \
-    /* Complete service list: */ \
-    0x03, 0x03, 0x15, 0x18
+    /* Complete service list (128-bit): */ \
+    0x11, 0x07, \
+    /* Gatt Service UUID (LSB): 11435b92-3653-4ab9-8c50-399456922854 */ \
+    0x54, 0x28, 0x92, 0x56, 0x94, 0x39, 0x50, 0x8c, 0xb9, 0x4a, 0x53, 0x36, 0x92, 0x5b, 0x43, 0x11
 
 // Same scan response as Adv0
 #define CFG_ADV1_DATA_SCANRSP_PAYLOAD \
     CFG_ADV0_DATA_SCANRSP_PAYLOAD
+    

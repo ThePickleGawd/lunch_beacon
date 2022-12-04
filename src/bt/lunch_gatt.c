@@ -38,16 +38,27 @@ static uint8_t atts_attr_handle[ATTS_ATTR_NUM];
  * DATA PARSER
  *******************************************************************************
  */
-static void try_write_lunch_data(uint8_t const *data, uint8_t len, uint8_t desired_len)
+static void try_write_student_data(uint8_t const *data, uint8_t len, uint8_t max_len)
 {
-	if(len != desired_len) {
-		ATM_LOG(W, "Cannot parse school id: len %d is not equal to %d", (int)len, (int)desired_len);
+	if(len > max_len) {
+		ATM_LOG(W, "Cannot write %s to student data, it's too large! (%d > %d)", data, len, max_len);
 		return;
 	}
 
 	// TODO: Add some more checks, like ascii characters only?
 
 	nvds_put_student_data(data);
+}
+
+static void try_write_school_data(uint8_t const *data, uint8_t len, uint8_t max_len)
+{
+	if(len > max_len) {
+		ATM_LOG(W, "Cannot write %s to school data, it's too large! (%d > %d)", data, len, max_len);
+		return;
+	}
+
+
+	return;
 }
 
 /*
@@ -62,14 +73,20 @@ static void try_write_lunch_data(uint8_t const *data, uint8_t len, uint8_t desir
 static uint8_t atts_read_req(uint8_t conidx, uint8_t att_idx)
 {
     ATM_LOG(D, "%s: att_idx (%d)", __func__, att_idx);
-	ATM_LOG(D, "TODO: check which characteristic with atts_attr_handle[]");
 
-	const uint8_t *data = (const uint8_t *)"test read";
-	ble_atmprfs_gattc_read_cfm(conidx, att_idx, data, sizeof(data));
+	nvds_lunch_data_t lunch_data = {};
+	nvds_get_lunch_data(&lunch_data);
+	
+	if(att_idx == atts_attr_handle[ATTS_CHAR_RW_SCHOOL_ID]) {
+		ATM_LOG(D, "Send read response: %s", lunch_data.school_id);
+		ble_atmprfs_gattc_read_cfm(conidx, att_idx, lunch_data.school_id, SCHOOL_ID_ARR_LEN);
+	} else if (att_idx == atts_attr_handle[ATTS_CHAR_RW_STUDENT_ID]) {
+		ATM_LOG(D, "Send read response: %s", lunch_data.student_id);
+		ble_atmprfs_gattc_read_cfm(conidx, att_idx, lunch_data.school_id, STUDENT_ID_ARR_LEN);
+	}
 
 	return ATT_ERR_NO_ERROR;
 }
-
 /**
  * @brief Callback registered with the ble_atmprfs module.
  * @note Called when write attribute request is received
@@ -81,12 +98,17 @@ static uint8_t atts_write_req(uint8_t conidx, uint8_t att_idx, uint8_t const *da
 
 	// Try to write data to respective spot
 	if(att_idx == atts_attr_handle[ATTS_CHAR_RW_SCHOOL_ID]) {
-		try_write_lunch_data(data, len, SCHOOL_ID_ARR_LEN);
+		try_write_school_data(data, len, SCHOOL_ID_ARR_LEN);
 	} else if (att_idx == atts_attr_handle[ATTS_CHAR_RW_STUDENT_ID]) {
-		try_write_lunch_data(data, len, STUDENT_ID_ARR_LEN);
+		try_write_student_data(data, len, STUDENT_ID_ARR_LEN);
 	}
 
 	return ATT_ERR_NO_ERROR;
+}
+
+static void callback(uint8_t conidx, const ble_gattc_cmp_evt_ex_t *param, const void *ctx)
+{
+	ATM_LOG(D, "Cool im called...");
 }
 
 /**
@@ -96,6 +118,11 @@ static uint8_t atts_write_req(uint8_t conidx, uint8_t att_idx, uint8_t const *da
 static void atts_write_cfm(uint8_t conidx, uint8_t att_idx)
 {
 	ATM_LOG(D, "%s: idk what to do here yet", __func__);
+
+	uint8_t status = ble_atmprfs_gattc_send_ntf(conidx, att_idx, (const uint8_t *) "TEST", sizeof("TEST"), callback);
+	if(status != ATT_ERR_NO_ERROR) {
+		ATM_LOG(E, "%s: Error code %d", __func__, status);
+	}
 }
 
 ble_atmprfs_cbs_t const atmprfs_cbs = {
