@@ -21,7 +21,7 @@
     /* First 6 bytes of SHA-1 Hash of school name (GUNN)*/ \
     0xb4, 0xb8, 0x85, 0xe7, 0x11, 0x79, \
     /* 10 byte Student ID in ascii (pad with 0x00)*/ \
-    0x00, 0x00, '9', '5', '0', '3', '0', '4', '8', '6'
+    '9', '5', '0', '3', '0', '4', '8', '6', 0x00, 0x00
     
 #define CFG_ADV0_DATA_SCANRSP_PAYLOAD \
     0x09,0xff,0x00,0x60,'A','T','M','B','L','E'

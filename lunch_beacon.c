@@ -28,7 +28,7 @@
 #include "lunch_gatt.h"
 #include "lunch_nvds.h"
 
-ATM_LOG_LOCAL_SETTING("lunch_beacon", D);
+ATM_LOG_LOCAL_SETTING("lunch_beacon", V);
 
 /*
  * FUNCTION DECLARATIONS
@@ -54,7 +54,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 #define GET_ADV_DATA(act_idx) (app_env.adv_data[act_to_idx(act_idx)])
 #define GET_SCAN_DATA(act_idx) (app_env.scan_data[act_to_idx(act_idx)])
 
-#define ADV_LUNCH_DATA_IDX 4
+#define ADV_LUNCH_DATA_IDX 8
 
 /*
  * VARIABLES
@@ -90,7 +90,7 @@ static void gap_init_cfm(ble_err_code_t status)
     }
 
     // Create adv
-    //atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
+    atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
 } 
 
 /*
@@ -126,7 +126,7 @@ static void gap_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
 {
     ATM_LOG(V, "%s", __func__);
 
-    atm_asm_move(S_TBL_IDX, OP_DISCONNECTED);
+    //atm_asm_move(S_TBL_IDX, OP_DISCONNECTED);
 }
 
 /*
@@ -218,18 +218,21 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
 
     if (idx == IDX_LUNCH) {
         // Fetch lunch data for adv params
-        nvds_lunch_data_t lunch_data = {
-            .school_id = {},
-            .student_id = {}
-        };
-
+        nvds_lunch_data_t lunch_data = {0};
         uint8_t err = nvds_get_lunch_data(&lunch_data);
         if(err == NVDS_OK) {
             // TODO: Update 950 number in adv param
-            memcpy(app_env.adv_data, (uint8_t *) &lunch_data, ADV_LUNCH_DATA_IDX);
+            if(*lunch_data.school_id == 0 || *lunch_data.student_id == 0) {
+                ATM_LOG(D, "Lunch Data not set yet, don't start adv");
+                atm_asm_set_state_op(S_TBL_IDX, S_IDLE, OP_END);
+                return;
+            }
+
+            memcpy((app_env.adv_data[idx]->data + ADV_LUNCH_DATA_IDX), (uint8_t *) &lunch_data, sizeof(nvds_lunch_data_t));
             ATM_LOG(D, "Found Lunch Data - School ID: %s - Student ID: %s", 
                 lunch_data.school_id,
                 lunch_data.student_id);
+            ATM_LOG(D, "NEW ADV DATA: %s%s", (char *) app_env.adv_data[idx]->data, (char *) (app_env.adv_data[idx]->data + ADV_LUNCH_DATA_IDX+6));
         } else {
             ATM_LOG(E, "%s - Could not fetch lunch data. Err = %d", __func__, err);
             return;
@@ -275,7 +278,7 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
  */
 static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_code_t status)
 {
-    ATM_LOG(V, "%s", __func__);
+    ATM_LOG(V, "%s: act_idx=%d", __func__, act_idx);
 
     ble_err_code_t ret = BLE_ERR_NO_ERROR;
 
@@ -299,7 +302,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
             ret = atm_adv_start(activity_idx, GET_START_ADV(act_idx));
         } break;
         case ATM_ADV_SCANDATA_DONE: {
-            if(atm_asm_get_current_state(act_idx) == S_ADV_STARTED) break;
+            if(atm_asm_get_current_state(S_TBL_IDX) == S_ADV_STARTED) break;
             ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
             ret = atm_adv_start(activity_idx, GET_START_ADV(act_idx));
         } break;
@@ -330,7 +333,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 
 /*
  * STATE MACHINES
- *******************************************************************************
+ **********************************************************     *********************
  */
 
 /*
@@ -448,6 +451,17 @@ static void ble_delete_pair_adv(void)
     atm_adv_delete(app_env.act_idx[IDX_PAIR_ADV]);
 }
 
+static void ble_stop_adv_and_pair(void)
+{
+    ATM_LOG(V, "%s", __func__);
+    ATM_LOG(D, "Stopping lunch adv");
+    
+    atm_adv_delete(app_env.act_idx[IDX_LUNCH]);
+    app_env.act_idx[IDX_LUNCH] = ATM_INVALID_ACTIDX;
+
+    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
+}
+
 // Once we create it and call the cfm
 // the ASM in atm_adv will callback with ADV_ON State or whatever
 
@@ -466,6 +480,8 @@ static const state_entry s_tbl[] = {
     {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, ble_start_on},
     // Delete the pairing beacon
     {S_OP(S_ADV_STARTED, OP_DELETE_PAIR_ADV), S_IDLE, ble_delete_pair_adv},
+    // Stop adv and move to 
+    {S_OP(S_ADV_STARTED, OP_CREATE_PAIR_ADV), S_IDLE, ble_stop_adv_and_pair},
     
     // Handle connections, timeouts, restarts
     {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, ble_connected},

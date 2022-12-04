@@ -11,15 +11,20 @@
  */
 
 #include <inttypes.h>
+#include "arch.h"
 
 #define NVDS_TAG_LUNCH_DATA 0xD0
 #define SCHOOL_ID_ARR_LEN 6
 #define STUDENT_ID_ARR_LEN 10
 
+/**
+ * @brief NVDS Lunch Data type
+ * @note The last byte for each array will always be 0 so that we can treat it like a string
+ */
 typedef struct {
     uint8_t school_id[SCHOOL_ID_ARR_LEN];
     uint8_t student_id[STUDENT_ID_ARR_LEN];
-} nvds_lunch_data_t;
+} __PACKED nvds_lunch_data_t;
 
 /**
  * @brief Get lunch data from nvds tag
@@ -44,3 +49,8 @@ uint8_t nvds_put_school_data(uint8_t const *school_data);
  * @returns NVDS_OK on success
 */
 uint8_t nvds_put_student_data(uint8_t const *student_data);
+
+/**
+ * @brief Print nvds lunch data
+ */
+void nvds_print_lunch_data(void);
