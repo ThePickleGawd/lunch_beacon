@@ -37,7 +37,6 @@ CFLAGS += \
 	-DCFG_NO_GAP_SEC \
 	-DCFG_NO_GAP_SCAN \
 	-DCFG_NO_GATTC \
-	-Wno-error=unused-function
 	-DPINMAP_$(BOARD)_OVERLAY="pinmap_$(BOARD)_overlay.h"
 
 # Predefined header adv stuff

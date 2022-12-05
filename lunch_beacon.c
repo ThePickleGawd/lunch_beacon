@@ -221,7 +221,6 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
         nvds_lunch_data_t lunch_data = {0};
         uint8_t err = nvds_get_lunch_data(&lunch_data);
         if(err == NVDS_OK) {
-            // TODO: Update 950 number in adv param
             if(*lunch_data.school_id == 0 || *lunch_data.student_id == 0) {
                 ATM_LOG(D, "Lunch Data not set yet, don't start adv");
                 atm_asm_set_state_op(S_TBL_IDX, S_IDLE, OP_END);
@@ -332,8 +331,8 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 }
 
 /*
- * STATE MACHINES
- **********************************************************     *********************
+ * STATE MACHINE
+ *******************************************************************************
  */
 
 /*
@@ -341,7 +340,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
  * Results in a state machine transition from S_INIT -> S_IDLE
  * @note Called upon app initialization
  */
-static void ble_init(void)
+static void lunch_ble_init(void)
 {
     ATM_LOG(V, "%s", __func__);
     
@@ -357,7 +356,7 @@ static void ble_init(void)
  * @brief Triggers a state machine transition from S_ADV_STARTING -> S_ADV_STARTED
  * @note Called once the advertisement has been created and started
  */
-static void ble_start_on(void)
+static void lunch_start_on(void)
 {
     ATM_LOG(V, "%s", __func__);
     atm_asm_set_state_op(S_TBL_IDX, S_ADV_STARTED, OP_END);
@@ -368,7 +367,7 @@ static void ble_start_on(void)
  * or once the advertisement has stopped in the S_CONNECTED state
  * @note Called upon a connection establishment
  */
-static void ble_connected(void)
+static void lunch_connected(void)
 {
     ATM_LOG(V, "%s", __func__);
     atm_asm_set_state_op(S_TBL_IDX, S_CONNECTED, OP_END);
@@ -378,7 +377,7 @@ static void ble_connected(void)
  * @brief Triggers a state machine transition from S_CONNECTED -> S_ADV_STOPPED
  * @note Called when the device has been disconnected
  */
-static void ble_disconnected(void)
+static void lunch_disconnected(void)
 {
     ATM_LOG(V, "%s", __func__);
     atm_asm_move(S_TBL_IDX, OP_RESTART_ADV);
@@ -388,7 +387,7 @@ static void ble_disconnected(void)
  * @brief Triggers a state machinetransition from S_ADV_STARTED -> S_ADV_STOPPED
  * @note Called when the advertisement has stopped in the S_ADV_STARTED state
  */
-static void ble_timeout(void)
+static void lunch_timeout(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -403,7 +402,7 @@ static void ble_timeout(void)
  * @note Called when the advertisement restart timer has expired in the
  * S_ADV_STOPPED state or the device gets disconnected after connection
  */
-static void ble_restart_adv(void)
+static void lunch_restart_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -413,7 +412,7 @@ static void ble_restart_adv(void)
     }
 }
 
-static void ble_create_lunch_adv(void)
+static void lunch_create_lunch_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
     ATM_LOG(D, "Creating lunch adv%s","");
@@ -432,7 +431,7 @@ static void ble_create_lunch_adv(void)
     }
 }
 
-static void ble_create_pair_adv(void)
+static void lunch_create_pair_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
     
@@ -444,14 +443,14 @@ static void ble_create_pair_adv(void)
     atm_adv_create(app_env.create[IDX_PAIR_ADV]); // adv_state_change (ATM_ADV_CREATED)
 }
 
-static void ble_delete_pair_adv(void)
+static void lunch_delete_pair_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
     ATM_LOG(D, "Delete Pairing ADV%s", "");
     atm_adv_delete(app_env.act_idx[IDX_PAIR_ADV]);
 }
 
-static void ble_stop_adv_and_pair(void)
+static void lunch_stop_adv_and_pair(void)
 {
     ATM_LOG(V, "%s", __func__);
     ATM_LOG(D, "Stopping lunch adv");
@@ -469,26 +468,26 @@ static void ble_stop_adv_and_pair(void)
 // When we are in STATE, and then receive OPERATION, move to NEXT_STATE and call handler
 static const state_entry s_tbl[] = {
     // Initialize module
-    {S_OP(S_INIT, OP_MODULE_INIT), S_IDLE, ble_init},
+    {S_OP(S_INIT, OP_MODULE_INIT), S_IDLE, lunch_ble_init},
     // Create lunch beacon
-    {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, ble_create_lunch_adv},
+    {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, lunch_create_lunch_adv},
     // Create pairing beacon
-    {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, ble_create_pair_adv},
+    {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, lunch_create_pair_adv},
     // Start the lunch beacon after receiving confirmation
-    {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, ble_start_on},
+    {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, lunch_start_on},
     // Start the pairing beacon after receiving confirmation
-    {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, ble_start_on},
+    {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, lunch_start_on},
     // Delete the pairing beacon
-    {S_OP(S_ADV_STARTED, OP_DELETE_PAIR_ADV), S_IDLE, ble_delete_pair_adv},
+    {S_OP(S_ADV_STARTED, OP_DELETE_PAIR_ADV), S_IDLE, lunch_delete_pair_adv},
     // Stop adv and move to 
-    {S_OP(S_ADV_STARTED, OP_CREATE_PAIR_ADV), S_IDLE, ble_stop_adv_and_pair},
+    {S_OP(S_ADV_STARTED, OP_CREATE_PAIR_ADV), S_IDLE, lunch_stop_adv_and_pair},
     
     // Handle connections, timeouts, restarts
-    {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, ble_connected},
-    {S_OP(S_CONNECTED, OP_DISCONNECTED), S_ADV_STOPPED, ble_disconnected},
-    {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, ble_connected},
-    {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, ble_timeout},
-    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_STARTING_LUNCH_ADV, ble_restart_adv}
+    {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, lunch_connected},
+    {S_OP(S_CONNECTED, OP_DISCONNECTED), S_ADV_STOPPED, lunch_disconnected},
+    {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, lunch_connected},
+    {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, lunch_timeout},
+    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_STARTING_LUNCH_ADV, lunch_restart_adv}
 };
 
 
