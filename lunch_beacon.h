@@ -38,7 +38,7 @@ typedef enum {
 typedef enum {
     LUNCH_ADV_TYPE,
     PAIR_ADV_TYPE
-} adv_create_t;
+} current_adv_t;
 
 typedef enum {
     IDX_LUNCH,
@@ -53,7 +53,7 @@ typedef struct {
     __ATM_ADV_START_PARAM_CONST atm_adv_start_t *start[CFG_GAP_ADV_MAX_INST];
     __ATM_ADV_DATA_PARAM_CONST atm_adv_data_t *adv_data[CFG_GAP_ADV_MAX_INST];
     __ATM_ADV_DATA_PARAM_CONST atm_adv_data_t *scan_data[CFG_GAP_ADV_MAX_INST];
-    adv_create_t create_adv_idx;
+    current_adv_t current_adv_idx;
     // act_idx managed by adv api so we don't know if it's just 0 or 1, need to hash it here
     uint8_t act_idx[CFG_GAP_ADV_MAX_INST];
 } app_env_t;

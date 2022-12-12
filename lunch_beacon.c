@@ -63,7 +63,6 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 
 static app_env_t app_env;
 static pm_lock_id_t adv_lock_hiber;
-static uint8_t activity_idx = ATM_INVALID_ACTIDX;
 
 /*
  * GAP CALLBACKS
@@ -84,9 +83,9 @@ static void gap_init_cfm(ble_err_code_t status)
     // Set max transmit power
     atm_ble_set_txpwr_max(CFG_ADV0_CREATE_MAX_TX_POWER);
 
-    // Init act_idx to ATM_INVALID_ADVIDX(0xFF)
+    // Init act_idx to ATM_INVALID_ACTIDX(0xFF)
     for (uint8_t idx = 0; idx < CFG_GAP_ADV_MAX_INST; idx++){
-        app_env.act_idx[idx] = ATM_INVALID_ADVIDX;
+        app_env.act_idx[idx] = ATM_INVALID_ACTIDX;
     }
 
     // Create adv
@@ -101,7 +100,7 @@ static void gap_conn_ind(uint8_t conidx, atm_connect_info_t *param)
 {
     ATM_LOG(V, "%s", __func__);
 
-    if(app_env.create_adv_idx != PAIR_ADV_TYPE) {
+    if(app_env.current_adv_idx != PAIR_ADV_TYPE) {
         ATM_LOG(E, "Connection established but it's not from pair adv?");
         return;
     }
@@ -126,7 +125,7 @@ static void gap_disc_ind(uint8_t conidx, ble_gap_ind_discon_t const *param)
 {
     ATM_LOG(V, "%s", __func__);
 
-    //atm_asm_move(S_TBL_IDX, OP_DISCONNECTED);
+    atm_asm_move(S_TBL_IDX, OP_DISCONNECTED);
 }
 
 /*
@@ -154,27 +153,21 @@ static const atm_gap_cbs_t gap_callbacks = {
  *******************************************************************************
  */
 
+
+static void asm_state_change_cb(ASM_S last_s, ASM_O op, ASM_S next_s)
+{
+    ATM_LOG(V, "ASM State Change from %d to %d, with OP Code %d", last_s, next_s, op);
+}
+
 static void button_cb(uint8_t idx, lunch_button_action_t key_action)
 {
     ATM_LOG(V, "%s: idx:%d, %d", __func__, idx, key_action);
     switch (key_action) {
 	case LUNCH_BTN_TAP: {
-	    ATM_LOG(D, "btn%d clicked", idx);
-        ATM_LOG(W, "tmp code here ;lsdkfjsldkfjsl;dkjf ahhhhhh");
-        // Fetch lunch data for adv params
-        nvds_lunch_data_t lunch_data = {
-            .school_id = {},
-            .student_id = {}
-        };
-
-        nvds_get_lunch_data(&lunch_data);
-        ATM_LOG(D, "student id is %s", lunch_data.student_id);
 	} break;
 
 	case LUNCH_BTN_PRESS: {
         ATM_LOG(D, "btn%d pressed", idx);
-        ATM_LOG(D, "Current state is %d", atm_asm_get_current_state(S_TBL_IDX));
-
 	    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
 	} break;
 
@@ -191,7 +184,7 @@ static uint8_t act_to_idx(uint8_t act_idx)
 	    return idx;
 	}
     }
-    ATM_LOG(E, "act_to_idx not find: act_idx=%d", act_idx);
+    ATM_LOG(E, "act_to_idx could not find: act_idx=%d", act_idx);
     ASSERT_ERR(0);
     return 0;
 }
@@ -205,12 +198,11 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     ATM_LOG(V, "%s", __func__);
 
     ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
-    activity_idx = act_idx;
 
     uint8_t idx;
 
-    if(app_env.create_adv_idx == LUNCH_ADV_TYPE) idx = IDX_LUNCH;
-    if(app_env.create_adv_idx == PAIR_ADV_TYPE) idx = IDX_PAIR_ADV;
+    if(app_env.current_adv_idx == LUNCH_ADV_TYPE) idx = IDX_LUNCH;
+    if(app_env.current_adv_idx == PAIR_ADV_TYPE) idx = IDX_PAIR_ADV;
 
     app_env.act_idx[idx] = act_idx;
     app_env.adv_data[idx] = atm_adv_advdata_param_get(idx);
@@ -247,7 +239,7 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     }
 
     if(app_env.adv_data[idx]) {
-        ble_err_code_t ret = atm_adv_set_adv_data(activity_idx, app_env.adv_data[idx]);
+        ble_err_code_t ret = atm_adv_set_adv_data(act_idx, app_env.adv_data[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Set adv data failed: %#x", __func__, ret);
 	        return;
@@ -255,7 +247,7 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     }
 
     if(app_env.scan_data[idx]) {
-        ble_err_code_t ret = atm_adv_set_scan_data(activity_idx, app_env.scan_data[idx]);
+        ble_err_code_t ret = atm_adv_set_scan_data(act_idx, app_env.scan_data[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Set scan data failed: %#x", __func__, ret);
 	        return;
@@ -263,7 +255,7 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
     }
 
     if(!app_env.scan_data[idx] && !app_env.adv_data[idx]) {
-        ble_err_code_t ret = atm_adv_start(activity_idx, app_env.start[idx]);
+        ble_err_code_t ret = atm_adv_start(act_idx, app_env.start[idx]);
         if(ret != BLE_ERR_NO_ERROR) {
             ATM_LOG(E, "%s: Failed to start adv with status %#x", __func__, ret);
 	        return;
@@ -277,11 +269,10 @@ static void ble_adv_create_cfm(uint8_t act_idx, ble_err_code_t status)
  */
 static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_code_t status)
 {
-    ATM_LOG(V, "%s: act_idx=%d", __func__, act_idx);
+    ATM_LOG(V, "%s: act_idx=%d adv_state=%d", __func__, act_idx, state);
 
     ble_err_code_t ret = BLE_ERR_NO_ERROR;
 
-    ATM_LOG(D, "adv_state = %d", state);
     switch (state) {
         case ATM_ADV_CREATING:
         case ATM_ADV_ADVDATA_SETTING:
@@ -291,19 +282,18 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
         case ATM_ADV_DELETING: {
         } break;
         case ATM_ADV_CREATED: {
-            // Create or start adv after it's created
             ATM_LOG(D, "ATM_ADV_CREATED act_idx=%d", act_idx);
             ble_adv_create_cfm(act_idx, status);
         } break;
         case ATM_ADV_ADVDATA_DONE: {
             // Start adv if adv is off and theres no scan data
             if(atm_adv_get_state(act_idx) != ATM_ADV_OFF || GET_SCAN_DATA(act_idx)) break;
-            ret = atm_adv_start(activity_idx, GET_START_ADV(act_idx));
+            ret = atm_adv_start(act_idx, GET_START_ADV(act_idx));
         } break;
         case ATM_ADV_SCANDATA_DONE: {
             if(atm_asm_get_current_state(S_TBL_IDX) == S_ADV_STARTED) break;
             ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
-            ret = atm_adv_start(activity_idx, GET_START_ADV(act_idx));
+            ret = atm_adv_start(act_idx, GET_START_ADV(act_idx));
         } break;
         case ATM_ADV_ON: {
             ASSERT_INFO(status == BLE_ERR_NO_ERROR, act_idx, status);
@@ -316,10 +306,16 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
             }
         } break;
         case ATM_ADV_OFF: {
-            atm_asm_move(S_TBL_IDX, OP_ADV_TIMEOUT);
+            if(atm_asm_get_current_state(S_TBL_IDX) != S_STARTING_PAIR_ADV)
+                atm_asm_move(S_TBL_IDX, OP_ADV_TIMEOUT);
+        } break;
+        case ATM_ADV_DELETED: {
+            // If we deleted the pair adv, go into regular beacon mode
+            if(app_env.current_adv_idx == PAIR_ADV_TYPE) {
+                atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
+            }
         } break;
         case ATM_ADV_IDLE:
-        case ATM_ADV_DELETED:
         default: {
             ATM_LOG(E, "Unhandled state = %d", state);
         } break;
@@ -393,40 +389,27 @@ static void lunch_timeout(void)
 
     atm_pm_unlock(adv_lock_hiber);
 
-    // TODO: this is where I'd set a sw_timer to restart
-}
-
-/*
- * @brief Triggers starting of the advertisement. Resulting in a state machine
- * transition from S_ADV_STOPPED -> S_ADV_STARTING
- * @note Called when the advertisement restart timer has expired in the
- * S_ADV_STOPPED state or the device gets disconnected after connection
- */
-static void lunch_restart_adv(void)
-{
-    ATM_LOG(V, "%s", __func__);
-
-    ble_err_code_t ret = atm_adv_start(activity_idx, GET_START_ADV(activity_idx));
-    if (ret != BLE_ERR_NO_ERROR) {
-	    ATM_LOG(E, "%s: Failed to restart adv with status %#x", __func__, ret);
+    if(app_env.current_adv_idx == LUNCH_ADV_TYPE) {
+        atm_asm_move(S_TBL_IDX, OP_RESTART_ADV);
+    } else {
+        atm_asm_move(S_TBL_IDX, OP_DELETE_PAIR_ADV);
     }
 }
 
 static void lunch_create_lunch_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
-    ATM_LOG(D, "Creating lunch adv%s","");
 
     // Fetch params
     app_env.create[IDX_LUNCH] = atm_adv_create_param_get(IDX_LUNCH);
     app_env.start[IDX_LUNCH] = atm_adv_start_param_get(IDX_LUNCH);
+    app_env.current_adv_idx = LUNCH_ADV_TYPE;
 
     if(app_env.act_idx[IDX_LUNCH] != ATM_INVALID_ACTIDX) {
-        ATM_LOG(D, "starting adv");
+        ATM_LOG(W, "NAHHHHH");
         atm_adv_start(app_env.act_idx[IDX_LUNCH], app_env.start[IDX_LUNCH]);
     } else {
-        ATM_LOG(D, "creating adv");
-        app_env.create_adv_idx = LUNCH_ADV_TYPE;
+        ATM_LOG(W, "AHHHHHH");
         atm_adv_create(app_env.create[IDX_LUNCH]); // adv_state_change (ATM_ADV_CREATED)
     }
 }
@@ -438,27 +421,37 @@ static void lunch_create_pair_adv(void)
     // Fetch params
     app_env.create[IDX_PAIR_ADV] = atm_adv_create_param_get(IDX_PAIR_ADV);
     app_env.start[IDX_PAIR_ADV] = atm_adv_start_param_get(IDX_PAIR_ADV);
+    app_env.current_adv_idx = PAIR_ADV_TYPE;
 
-    app_env.create_adv_idx = PAIR_ADV_TYPE;
-    atm_adv_create(app_env.create[IDX_PAIR_ADV]); // adv_state_change (ATM_ADV_CREATED)
+    if(app_env.act_idx[IDX_PAIR_ADV] != ATM_INVALID_ACTIDX) {
+        ATM_LOG(W, "YUHHHH");
+        atm_adv_start(app_env.act_idx[IDX_PAIR_ADV], app_env.start[IDX_PAIR_ADV]);
+    } else {
+        ATM_LOG(W, "KAHHHHH");
+        atm_adv_create(app_env.create[IDX_PAIR_ADV]); // adv_state_change (ATM_ADV_CREATED)
+    }
 }
 
 static void lunch_delete_pair_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
-    ATM_LOG(D, "Delete Pairing ADV%s", "");
+
     atm_adv_delete(app_env.act_idx[IDX_PAIR_ADV]);
+    app_env.act_idx[IDX_PAIR_ADV] = ATM_INVALID_ACTIDX;
 }
 
 static void lunch_stop_adv_and_pair(void)
 {
     ATM_LOG(V, "%s", __func__);
-    ATM_LOG(D, "Stopping lunch adv");
-    
-    atm_adv_delete(app_env.act_idx[IDX_LUNCH]);
-    app_env.act_idx[IDX_LUNCH] = ATM_INVALID_ACTIDX;
 
-    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
+    if(app_env.current_adv_idx == LUNCH_ADV_TYPE) {
+        atm_adv_stop(app_env.act_idx[IDX_LUNCH]);
+        atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
+    } else {
+        // Don't go to idle mode
+        atm_asm_set_state_op(S_TBL_IDX, S_ADV_STARTED, OP_END);
+    }
+
 }
 
 // Once we create it and call the cfm
@@ -477,9 +470,7 @@ static const state_entry s_tbl[] = {
     {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, lunch_start_on},
     // Start the pairing beacon after receiving confirmation
     {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, lunch_start_on},
-    // Delete the pairing beacon
-    {S_OP(S_ADV_STARTED, OP_DELETE_PAIR_ADV), S_IDLE, lunch_delete_pair_adv},
-    // Stop adv and move to 
+    // Stop adv and move to go into pairing mode
     {S_OP(S_ADV_STARTED, OP_CREATE_PAIR_ADV), S_IDLE, lunch_stop_adv_and_pair},
     
     // Handle connections, timeouts, restarts
@@ -487,7 +478,8 @@ static const state_entry s_tbl[] = {
     {S_OP(S_CONNECTED, OP_DISCONNECTED), S_ADV_STOPPED, lunch_disconnected},
     {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, lunch_connected},
     {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, lunch_timeout},
-    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_STARTING_LUNCH_ADV, lunch_restart_adv}
+    {S_OP(S_ADV_STOPPED, OP_DELETE_PAIR_ADV), S_IDLE, lunch_delete_pair_adv},
+    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_STARTING_LUNCH_ADV, lunch_create_lunch_adv}
 };
 
 
@@ -511,6 +503,7 @@ static rep_vec_err_t user_appm_init(void)
 
     // Initialize state machine
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));
+    atm_asm_reg_state_change_cb(S_TBL_IDX, asm_state_change_cb);
     atm_asm_set_state_op(S_TBL_IDX, S_INIT, OP_END);
     atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
 

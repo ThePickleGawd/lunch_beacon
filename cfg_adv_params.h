@@ -7,8 +7,9 @@
  *******************************************************************************
  */
 
-// TODO: Set power to be something reasonable
-#define CFG_ADV0_CREATE_MAX_TX_POWER 0
+// Units in dbm (ex. 0x04 = 4dbm or 0xFF = -1dbm)
+// For negative number 0xFF-val+1
+#define CFG_ADV0_CREATE_MAX_TX_POWER 0xB0
 
 // At first, we don't want our beacon to be connectable
 #define CFG_ADV0_CREATE_PROPERTY ADV_LEGACY_NON_CONN_SCAN_MASK
