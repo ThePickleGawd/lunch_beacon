@@ -8,8 +8,8 @@ endif
 reference_beacon_blank := \
 	d0-LUNCH_DATA/default \
 	01-BD_ADDRESS/direct_201 \
-	# 11-SLEEP_ENABLE/ret_drop \
-	# 12-EXT_WAKEUP_ENABLE/enable \
+	11-SLEEP_ENABLE/hib \
+	12-EXT_WAKEUP_ENABLE/enable \
 
 #
 # Lunch Beacon
@@ -205,7 +205,7 @@ reference_beacon_WURX := \
 	06-APP_BLE_ACT_CRT_CMD/legacy_nc_ns_30ms \
 	0b-APP_BLE_ADV_DATA/beacon_201 \
 	05-APP_BLE_ACT_STRT_CMD/1_adv \
-	b4-PMU_WURX/wurx_demo \
+	b4-PMU_WURX/high_duty_adv \
 	21-APP_WURX_BLE_ACT_CRT_CMD/legacy_nc_s_300ms \
 	22-APP_WURX_BLE_ADV_DATA/beacon_201 \
 	23-APP_WURX_BLE_SCAN_RESP_DATA/beacon_201 \
