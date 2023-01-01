@@ -10,6 +10,7 @@
 #include "co_error.h"
 #include "co_utils.h"
 #include "flash.h"
+#include "wurx.h"
 #include "ext_flash.h"
 #include "atm_gpio.h"
 #include "atm_log.h"
@@ -62,7 +63,8 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
  */
 
 static app_env_t app_env;
-static pm_lock_id_t adv_lock_hiber;
+static pm_lock_id_t lock_hiber;
+static bool is_wurx = false;
 
 /*
  * GAP CALLBACKS
@@ -149,10 +151,31 @@ static const atm_gap_cbs_t gap_callbacks = {
 };
 
 /*
- * STATIC FUNCTIONS
+ * WURX
  *******************************************************************************
  */
 
+/**
+ * @brief Enable WURX in prevent hibernation vector.
+ * @note Called before the system enters the hibernation mode.
+ * @param prevent Pointer to prevent control.
+ * @param pseq_dur Pointer to hibernation duration.
+ * @param ble_dur BLE sleep duration.
+ */
+__FAST static rep_vec_err_t
+wurx_adv_prevent_hib(bool *prevent, int32_t *pseq_dur, int32_t ble_dur)
+{
+    if (!boot_was_cold()) {
+	    wurx_enable();
+    }
+    return RV_NEXT;
+}
+
+
+/*
+ * STATIC FUNCTIONS
+ *******************************************************************************
+ */
 
 static void asm_state_change_cb(ASM_S last_s, ASM_O op, ASM_S next_s)
 {
@@ -167,7 +190,7 @@ static void button_cb(uint8_t idx, lunch_button_action_t key_action)
 	} break;
 
 	case LUNCH_BTN_PRESS: {
-        ATM_LOG(D, "btn%d pressed", idx);
+        ATM_LOG(V, "btn%d pressed", idx);
 	    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
 	} break;
 
@@ -339,6 +362,8 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 static void lunch_ble_init(void)
 {
     ATM_LOG(V, "%s", __func__);
+
+    if(!is_wurx) return;
     
     // Create gatt profile
     lunch_atts_create_prf();
@@ -376,7 +401,7 @@ static void lunch_connected(void)
 static void lunch_disconnected(void)
 {
     ATM_LOG(V, "%s", __func__);
-    atm_asm_move(S_TBL_IDX, OP_RESTART_ADV);
+    atm_asm_move(S_TBL_IDX, OP_SLEEP);
 }
 
 /*
@@ -387,10 +412,8 @@ static void lunch_timeout(void)
 {
     ATM_LOG(V, "%s", __func__);
 
-    atm_pm_unlock(adv_lock_hiber);
-
     if(app_env.current_adv_idx == LUNCH_ADV_TYPE) {
-        atm_asm_move(S_TBL_IDX, OP_RESTART_ADV);
+        atm_asm_move(S_TBL_IDX, OP_SLEEP);
     } else {
         atm_asm_move(S_TBL_IDX, OP_DELETE_PAIR_ADV);
     }
@@ -451,7 +474,11 @@ static void lunch_stop_adv_and_pair(void)
         // Don't go to idle mode
         atm_asm_set_state_op(S_TBL_IDX, S_ADV_STARTED, OP_END);
     }
+}
 
+static void lunch_sleep(void)
+{
+    atm_pm_unlock(lock_hiber);
 }
 
 // Once we create it and call the cfm
@@ -479,25 +506,11 @@ static const state_entry s_tbl[] = {
     {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, lunch_connected},
     {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, lunch_timeout},
     {S_OP(S_ADV_STOPPED, OP_DELETE_PAIR_ADV), S_IDLE, lunch_delete_pair_adv},
-    {S_OP(S_ADV_STOPPED, OP_RESTART_ADV), S_STARTING_LUNCH_ADV, lunch_create_lunch_adv}
+    {S_OP(S_ADV_STOPPED, OP_SLEEP), S_IDLE, lunch_sleep}
 };
-
-
-/*
- * @brief Starts the advertisement
- * @note Scheduled when the advertisement has stopped in the S_ADV_STARTED state
- */
-// static void restart_timer(uint8_t idx, const void *ctx)
-// {
-//     atm_asm_move(S_TBL_IDX, OP_RESTART_ADV);
-// }
 
 static rep_vec_err_t user_appm_init(void)
 {
-    // Prevent application from hibernating
-    adv_lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
-    atm_pm_lock(adv_lock_hiber);
-
     // Initialize button
     lunch_btn_init(button_cb);
 
@@ -505,6 +518,27 @@ static rep_vec_err_t user_appm_init(void)
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));
     atm_asm_reg_state_change_cb(S_TBL_IDX, asm_state_change_cb);
     atm_asm_set_state_op(S_TBL_IDX, S_INIT, OP_END);
+
+    // Setup WuRX
+    RV_PLF_PREVENT_HIBERNATION_ADD_LAST(wurx_adv_prevent_hib);
+
+    lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
+
+    // Check if woken by WuRX
+    if (!boot_was_cold()) {
+        ATM_LOG(V, "WuRX Boot");
+
+        wurx_disable();
+        atm_pm_lock(lock_hiber);
+        is_wurx = true;
+    } else {
+        ATM_LOG(V, "Cold Boot");
+
+        atm_pm_unlock(lock_hiber);
+        is_wurx = false;
+    }
+    
+    // Move state machine
     atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
 
     return RV_DONE;

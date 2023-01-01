@@ -13,6 +13,7 @@ DRIVERS := \
 	atm_button \
 	atm_vkey \
 	sw_event \
+	wurx \
 
 LIBRARIES := prf
 
@@ -37,7 +38,8 @@ CFLAGS += \
 	-DCFG_NO_GAP_SEC \
 	-DCFG_NO_GAP_SCAN \
 	-DCFG_NO_GATTC \
-	-DPINMAP_$(BOARD)_OVERLAY="pinmap_$(BOARD)_overlay.h"
+	-DPINMAP_$(BOARD)_OVERLAY="pinmap_$(BOARD)_overlay.h" \
+	-DCFG_WURX_FROM_FLASH_NVDS \
 
 # Predefined header adv stuff
 CFLAGS += \
@@ -59,7 +61,11 @@ C_SRCS += \
 	$(SRC_NON_BT)/lunch_nvds.c \
 	$(SRC_BT)/lunch_gatt.c \
 
-include reference_beacons.mk
-flash_nvds.data := $(reference_beacon_$(REF_BCN)) $(if $(AUTO_RESTART),09-APP_BLE_RSTRT_DUR/500ms)
+flash_nvds.data := \
+	d0-LUNCH_DATA/default \
+	01-BD_ADDRESS/direct_201 \
+	11-SLEEP_ENABLE/hib \
+	12-EXT_WAKEUP_ENABLE/enable2 \
+	b4-PMU_WURX/high_duty_adv \
 
 include $(COMMON_USER_DIR)/framework.mk
