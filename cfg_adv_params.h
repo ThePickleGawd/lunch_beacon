@@ -9,7 +9,7 @@
 
 // Units in dbm (ex. 0x04 = 4dbm or 0xFF = -1dbm)
 // For negative number 0xFF-val+1
-#define CFG_ADV0_CREATE_MAX_TX_POWER 0xBA
+//#define CFG_ADV0_CREATE_MAX_TX_POWER 0xBA
 #define CFG_ADV0_CREATE_PROPERTY ADV_LEGACY_NON_CONN_SCAN_MASK
 #define CFG_ADV0_START_DURATION 6000 // 10s (unit of 10ms) TODO: change
 
