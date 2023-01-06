@@ -359,7 +359,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
  * Results in a state machine transition from S_INIT -> S_IDLE
  * @note Called upon app initialization
  */
-static void lunch_ble_init(void)
+static void lunch_s_init(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -377,7 +377,7 @@ static void lunch_ble_init(void)
  * @brief Triggers a state machine transition from S_ADV_STARTING -> S_ADV_STARTED
  * @note Called once the advertisement has been created and started
  */
-static void lunch_start_on(void)
+static void lunch_s_start_on(void)
 {
     ATM_LOG(V, "%s", __func__);
     atm_asm_set_state_op(S_TBL_IDX, S_ADV_STARTED, OP_END);
@@ -388,7 +388,7 @@ static void lunch_start_on(void)
  * or once the advertisement has stopped in the S_CONNECTED state
  * @note Called upon a connection establishment
  */
-static void lunch_connected(void)
+static void lunch_s_connected(void)
 {
     ATM_LOG(V, "%s", __func__);
     atm_asm_set_state_op(S_TBL_IDX, S_CONNECTED, OP_END);
@@ -398,7 +398,7 @@ static void lunch_connected(void)
  * @brief Triggers a state machine transition from S_CONNECTED -> S_ADV_STOPPED
  * @note Called when the device has been disconnected
  */
-static void lunch_disconnected(void)
+static void lunch_s_disconnected(void)
 {
     ATM_LOG(V, "%s", __func__);
     atm_asm_move(S_TBL_IDX, OP_SLEEP);
@@ -408,7 +408,7 @@ static void lunch_disconnected(void)
  * @brief Triggers a state machinetransition from S_ADV_STARTED -> S_ADV_STOPPED
  * @note Called when the advertisement has stopped in the S_ADV_STARTED state
  */
-static void lunch_timeout(void)
+static void lunch_s_timeout(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -419,7 +419,7 @@ static void lunch_timeout(void)
     }
 }
 
-static void lunch_create_lunch_adv(void)
+static void lunch_s_create_lunch_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -437,7 +437,7 @@ static void lunch_create_lunch_adv(void)
     }
 }
 
-static void lunch_create_pair_adv(void)
+static void lunch_s_create_pair_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
     
@@ -455,7 +455,7 @@ static void lunch_create_pair_adv(void)
     }
 }
 
-static void lunch_delete_pair_adv(void)
+static void lunch_s_delete_pair_adv(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -463,7 +463,7 @@ static void lunch_delete_pair_adv(void)
     app_env.act_idx[IDX_PAIR_ADV] = ATM_INVALID_ACTIDX;
 }
 
-static void lunch_stop_adv_and_pair(void)
+static void lunch_s_stop_adv_and_pair(void)
 {
     ATM_LOG(V, "%s", __func__);
 
@@ -476,7 +476,7 @@ static void lunch_stop_adv_and_pair(void)
     }
 }
 
-static void lunch_sleep(void)
+static void lunch_s_sleep(void)
 {
     atm_pm_unlock(lock_hiber);
 }
@@ -488,25 +488,25 @@ static void lunch_sleep(void)
 // When we are in STATE, and then receive OPERATION, move to NEXT_STATE and call handler
 static const state_entry s_tbl[] = {
     // Initialize module
-    {S_OP(S_INIT, OP_MODULE_INIT), S_IDLE, lunch_ble_init},
+    {S_OP(S_INIT, OP_MODULE_INIT), S_IDLE, lunch_s_init},
     // Create lunch beacon
-    {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, lunch_create_lunch_adv},
+    {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, lunch_s_create_lunch_adv},
     // Create pairing beacon
-    {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, lunch_create_pair_adv},
+    {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, lunch_s_create_pair_adv},
     // Start the lunch beacon after receiving confirmation
-    {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, lunch_start_on},
+    {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, lunch_s_start_on},
     // Start the pairing beacon after receiving confirmation
-    {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, lunch_start_on},
+    {S_OP(S_STARTING_PAIR_ADV, OP_CREATE_PAIR_CFM), S_ADV_STARTED, lunch_s_start_on},
     // Stop adv and move to go into pairing mode
-    {S_OP(S_ADV_STARTED, OP_CREATE_PAIR_ADV), S_IDLE, lunch_stop_adv_and_pair},
+    {S_OP(S_ADV_STARTED, OP_CREATE_PAIR_ADV), S_IDLE, lunch_s_stop_adv_and_pair},
     
     // Handle connections, timeouts, restarts
-    {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, lunch_connected},
-    {S_OP(S_CONNECTED, OP_DISCONNECTED), S_ADV_STOPPED, lunch_disconnected},
-    {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, lunch_connected},
-    {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, lunch_timeout},
-    {S_OP(S_ADV_STOPPED, OP_DELETE_PAIR_ADV), S_IDLE, lunch_delete_pair_adv},
-    {S_OP(S_ADV_STOPPED, OP_SLEEP), S_IDLE, lunch_sleep}
+    {S_OP(S_ADV_STARTED, OP_CONNECTED), S_CONNECTED, lunch_s_connected},
+    {S_OP(S_CONNECTED, OP_DISCONNECTED), S_ADV_STOPPED, lunch_s_disconnected},
+    {S_OP(S_CONNECTED, OP_ADV_TIMEOUT), S_CONNECTED, lunch_s_connected},
+    {S_OP(S_ADV_STARTED, OP_ADV_TIMEOUT), S_ADV_STOPPED, lunch_s_timeout},
+    {S_OP(S_ADV_STOPPED, OP_DELETE_PAIR_ADV), S_IDLE, lunch_s_delete_pair_adv},
+    {S_OP(S_ADV_STOPPED, OP_SLEEP), S_IDLE, lunch_s_sleep}
 };
 
 static rep_vec_err_t user_appm_init(void)
