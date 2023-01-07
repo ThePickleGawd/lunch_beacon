@@ -182,22 +182,9 @@ static void asm_state_change_cb(ASM_S last_s, ASM_O op, ASM_S next_s)
     ATM_LOG(V, "ASM State Change from %d to %d, with OP Code %d", last_s, next_s, op);
 }
 
-static void button_cb(uint8_t idx, lunch_button_action_t key_action)
+static void button_press_cb(void)
 {
-    ATM_LOG(V, "%s: idx:%d, %d", __func__, idx, key_action);
-    switch (key_action) {
-	case LUNCH_BTN_TAP: {
-	} break;
-
-	case LUNCH_BTN_PRESS: {
-        ATM_LOG(V, "btn%d pressed", idx);
-	    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
-	} break;
-
-	default: {
-	    ATM_LOG(W, "unhandle key(%d)action(%d)", idx, key_action);
-	} break;
-    }
+    atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
 }
 
 static uint8_t act_to_idx(uint8_t act_idx)
@@ -512,7 +499,7 @@ static const state_entry s_tbl[] = {
 static rep_vec_err_t user_appm_init(void)
 {
     // Initialize button
-    lunch_btn_init(button_cb);
+    lunch_btn_init(button_press_cb);
 
     // Initialize state machine
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));

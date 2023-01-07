@@ -21,68 +21,59 @@
 ATM_LOG_LOCAL_SETTING("lunch_button", V);
 
 // Button Configuration
-#define BTN_TAP_HOLD_TIME_MS 0
-#define BTN_TAP_HOLD_MAX_TIME_MS 200
-#define BTN_LONG_PRESS_MIN_TIME_MS 2000
+#define BTN_PRESS_MIN_TIME_CS 200
+#define BTN_CHECK_PRESS_INTERVAL_CS 20
+#define MAX_PRESS_CHECKS (BTN_PRESS_MIN_TIME_CS / BTN_CHECK_PRESS_INTERVAL_CS)
 
-static key_event_cb event_cb;
-static pm_lock_id_t vk_lock_hiber;
+static press_event_cb event_cb;
+static sw_timer_id_t check_press_tid;
 
-static void btn_tap_handler(atm_vk_ck_evt_t const *evt, void const *ctx)
+int check_press_counter = 0;
+
+static void check_press(sw_timer_id_t timer_id, const void *ctx)
 {
-    ATM_LOG(V, "%s: key %d tap %d ms", __func__, evt->top.vkey, evt->time_ms);
-    if (event_cb) {
-	event_cb(evt->top.vkey, LUNCH_BTN_TAP);
-    }
-}
+    sw_timer_clear(check_press_tid);
 
-static bool btn_press_handler(atm_vk_hd_evt_t const *evt, void const *ctx)
-{
-    ATM_LOG(V, "%s: key_mask %#" PRIx32 ", press %d ms", __func__,
-	evt->held.mask[0], evt->time_ms);
-    for (uint8_t vkey = 0; vkey < KEY_NUM; vkey++) {
-	if ((evt->held.mask[0] & (1 << vkey)) && event_cb) {
-	    event_cb(vkey, LUNCH_BTN_PRESS);
-	}
-    }
+    check_press_counter++;
 
-    return false;
-}
-
-static void hold_key_status_ind(bool pressed, void const *ctx)
-{
-    if (pressed) {
-	atm_pm_lock(vk_lock_hiber);
+    if(check_press_counter >= MAX_PRESS_CHECKS) {
+        event_cb(); 
+        check_press_counter = 0;
     } else {
-	atm_pm_unlock(vk_lock_hiber);
+        if(atm_gpio_read_gpio(10) == 1) {
+            // Still pressing, keep checking
+            sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
+        } else {
+            // Stopped pressing, abort
+            check_press_counter = 0;
+        }
     }
 }
 
-static void button_cb(bool is_press, uint8_t idx, void const *ctx)
+__FAST static void interrupt_hdlr(uint32_t mask)
 {
-    struct vkll_ctx_s *handle = CONTEXT_VOID_P(ctx);
-    atm_vkey_feed(handle, idx, is_press);
+    ATM_LOG(D, "BOY I WAS CALLED");
+    atm_gpio_set_int_disable(10);
+    atm_gpio_clear_int_status(10);
+
+    atm_gpio_int_set_rising(10);
+    atm_gpio_set_int_enable(10);
+
+    sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
 }
 
-void lunch_btn_init(key_event_cb cb)
+void lunch_btn_init(press_event_cb cb)
 {
-    static atm_vk_reg_t const vkeys[] = {
-	VKEY_CLICK(btn_tap_handler, LUNCH_BTN1, BTN_TAP_HOLD_TIME_MS,
-	    BTN_TAP_HOLD_MAX_TIME_MS),
-        VKEY_HOLD(btn_press_handler, hold_key_status_ind,
-	    BTN_LONG_PRESS_MIN_TIME_MS, (1 << LUNCH_BTN1))
-    };
-
-    static uint8_t const key_gpios[KEY_NUM] = {
-	10
-    };
-    atm_button_set_gpio(KEY_NUM, key_gpios);
-    atm_button_reg(button_cb,
-	atm_vkey_add_table(vkeys, ARRAY_LEN(vkeys), NULL));
-    if (cb) {
 	event_cb = cb;
-    }
-    vk_lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
-    ATM_LOG(V, "Button init!!");
+    check_press_tid = sw_timer_alloc(check_press, NULL);
+
+    atm_gpio_setup(10);
+    atm_gpio_set_input(10);
+
+    interrupt_install_gpio(10, 3, interrupt_hdlr);    
+
+    atm_gpio_int_set_rising(10);
+    atm_gpio_set_int_enable(10);
+
 }
 
