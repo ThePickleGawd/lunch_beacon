@@ -55,7 +55,7 @@ CFLAGS += \
 SRC_TOP = src
 SRC_BT = src/bt
 SRC_NON_BT = src/non_bt
-INCLUDES += $(SRC_BT) $(SRC_NON_BT)
+INCLUDES += $(SRC_BT) $(SRC_NON_BT) $(SRC_TOP)
 C_SRCS += \
 	$(SRC_NON_BT)/lunch_button.c \
 	$(SRC_NON_BT)/lunch_nvds.c \

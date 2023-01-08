@@ -498,9 +498,6 @@ static const state_entry s_tbl[] = {
 
 static rep_vec_err_t user_appm_init(void)
 {
-    // Initialize button
-    lunch_btn_init(button_press_cb);
-
     // Initialize state machine
     atm_asm_init_table(S_TBL_IDX, s_tbl, ARRAY_LEN(s_tbl));
     atm_asm_reg_state_change_cb(S_TBL_IDX, asm_state_change_cb);
@@ -518,6 +515,9 @@ static rep_vec_err_t user_appm_init(void)
         wurx_disable();
         atm_pm_lock(lock_hiber);
         is_wurx = true;
+
+        // Check if we are holding button
+        lunch_button_check_on_boot();
     } else {
         ATM_LOG(V, "Cold Boot");
 
@@ -533,6 +533,9 @@ static rep_vec_err_t user_appm_init(void)
 
 int main(void) 
 {
+    // Initialize button
+    lunch_button_init(button_press_cb);
+
     RV_APPM_INIT_ADD_LAST(user_appm_init);
 
     ATM_LOG(D, "user_main() done%s", "");

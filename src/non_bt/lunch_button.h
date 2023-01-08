@@ -17,9 +17,16 @@ typedef void (*press_event_cb)(void);
 
 /**
  *******************************************************************************
- * @brief Initial Button
+ * @brief Initialize Button
  *
- * @param[in] cb  Callback function for key event (NULL for no callback)
+ * @param[in] cb  Callback function for press event
  *******************************************************************************
  */
-void lunch_btn_init(press_event_cb cb);
+void lunch_button_init(press_event_cb cb);
+
+/**
+ *******************************************************************************
+ * @brief Check if button press was the cause of wakeup
+ *******************************************************************************
+ */
+void lunch_button_check_on_boot(void);

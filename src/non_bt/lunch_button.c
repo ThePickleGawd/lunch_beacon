@@ -16,6 +16,9 @@
 #include "atm_utils_c.h"
 #include "lunch_button.h"
 #include "atm_pm.h"
+#include "atm_gpio.h"
+#include "sw_timer.h"
+#include "interrupt.h"
 #include "pinmux.h"
 
 ATM_LOG_LOCAL_SETTING("lunch_button", V);
@@ -62,7 +65,12 @@ __FAST static void interrupt_hdlr(uint32_t mask)
     sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
 }
 
-void lunch_btn_init(press_event_cb cb)
+void lunch_button_check_on_boot(void)
+{
+    sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
+}
+
+void lunch_button_init(press_event_cb cb)
 {
 	event_cb = cb;
     check_press_tid = sw_timer_alloc(check_press, NULL);
