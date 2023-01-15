@@ -11,7 +11,7 @@
 // For negative number 0xFF-val+1
 //#define CFG_ADV0_CREATE_MAX_TX_POWER 0xBA
 #define CFG_ADV0_CREATE_PROPERTY ADV_LEGACY_NON_CONN_SCAN_MASK
-#define CFG_ADV0_START_DURATION 6000 // 10s (unit of 10ms) TODO: change
+#define CFG_ADV0_START_DURATION 6000 // 60s (unit of 10ms) TODO: change
 
 #define CFG_ADV0_DATA_ADV_PAYLOAD \
     /* Complete service list: 0x2af5 = fixed string 16 */ \
