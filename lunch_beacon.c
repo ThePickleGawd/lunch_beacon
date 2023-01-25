@@ -445,6 +445,8 @@ static void lunch_s_delete_pair_adv(void)
 
     atm_adv_delete(app_env.act_idx[IDX_PAIR_ADV]);
     app_env.act_idx[IDX_PAIR_ADV] = ATM_INVALID_ACTIDX;
+
+    atm_pm_unlock(lock_hiber);
 }
 
 static void lunch_s_stop_adv_and_pair(void)
@@ -468,7 +470,8 @@ static void lunch_s_sleep(void)
 void testing_press_init(void)
 {
     ATM_LOG(W, "Testing purposes only! Init gap on button press");
-    atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
+    if(atm_asm_get_current_state(S_TBL_IDX) == S_INIT)
+        atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
 }
 
 // Once we create it and call the cfm
