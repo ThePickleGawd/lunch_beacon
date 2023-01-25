@@ -40,7 +40,7 @@ static uint8_t atts_attr_handle[ATTS_ATTR_NUM];
  */
 static void try_write_student_data(uint8_t const *data, uint8_t len)
 {
-	if(len > STUDENT_ID_ARR_LEN) {
+	if(len >= STUDENT_ID_ARR_LEN) {
 		ATM_LOG(W, "Cannot write %s to student data, it's too large! (%d > %d)", data, len, STUDENT_ID_ARR_LEN);
 		return;
 	}
@@ -56,7 +56,7 @@ static void try_write_student_data(uint8_t const *data, uint8_t len)
 
 static void try_write_school_data(uint8_t const *data, uint8_t len)
 {
-	if(len > SCHOOL_ID_ARR_LEN) {
+	if(len >= SCHOOL_ID_ARR_LEN) {
 		ATM_LOG(W, "Cannot write %s to school data, it's too large! (%d > %d)", data, len, SCHOOL_ID_ARR_LEN);
 		return;
 	}

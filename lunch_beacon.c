@@ -64,7 +64,6 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
 
 static app_env_t app_env;
 static pm_lock_id_t lock_hiber;
-static bool is_wurx = false;
 
 /*
  * GAP CALLBACKS
@@ -90,8 +89,12 @@ static void gap_init_cfm(ble_err_code_t status)
         app_env.act_idx[idx] = ATM_INVALID_ACTIDX;
     }
 
-    // Create adv
-    atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
+    // Create lunch adv if awoken normally by WuRX
+    if(atm_asm_get_latest_transition(S_TBL_IDX).operation == OP_MODULE_INIT)
+        atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_ADV);
+    // Create pair adv if awoken by button press
+    else if(atm_asm_get_latest_transition(S_TBL_IDX).operation == OP_CREATE_PAIR_ADV)
+        atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_ADV);
 } 
 
 /*
@@ -350,8 +353,6 @@ static void lunch_s_init(void)
 {
     ATM_LOG(V, "%s", __func__);
 
-    if(!is_wurx) return;
-    
     // Create gatt profile
     lunch_atts_create_prf();
     atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL); 
@@ -416,10 +417,8 @@ static void lunch_s_create_lunch_adv(void)
     app_env.current_adv_idx = LUNCH_ADV_TYPE;
 
     if(app_env.act_idx[IDX_LUNCH] != ATM_INVALID_ACTIDX) {
-        ATM_LOG(W, "NAHHHHH");
         atm_adv_start(app_env.act_idx[IDX_LUNCH], app_env.start[IDX_LUNCH]);
     } else {
-        ATM_LOG(W, "AHHHHHH");
         atm_adv_create(app_env.create[IDX_LUNCH]); // adv_state_change (ATM_ADV_CREATED)
     }
 }
@@ -434,10 +433,8 @@ static void lunch_s_create_pair_adv(void)
     app_env.current_adv_idx = PAIR_ADV_TYPE;
 
     if(app_env.act_idx[IDX_PAIR_ADV] != ATM_INVALID_ACTIDX) {
-        ATM_LOG(W, "YUHHHH");
         atm_adv_start(app_env.act_idx[IDX_PAIR_ADV], app_env.start[IDX_PAIR_ADV]);
     } else {
-        ATM_LOG(W, "KAHHHHH");
         atm_adv_create(app_env.create[IDX_PAIR_ADV]); // adv_state_change (ATM_ADV_CREATED)
     }
 }
@@ -468,6 +465,12 @@ static void lunch_s_sleep(void)
     atm_pm_unlock(lock_hiber);
 }
 
+void testing_press_init(void)
+{
+    ATM_LOG(W, "Testing purposes only! Init gap on button press");
+    atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
+}
+
 // Once we create it and call the cfm
 // the ASM in atm_adv will callback with ADV_ON State or whatever
 
@@ -479,6 +482,7 @@ static const state_entry s_tbl[] = {
     // Create lunch beacon
     {S_OP(S_IDLE, OP_CREATE_LUNCH_ADV), S_STARTING_LUNCH_ADV, lunch_s_create_lunch_adv},
     // Create pairing beacon
+    {S_OP(S_INIT, OP_CREATE_PAIR_ADV), S_IDLE, lunch_s_init},
     {S_OP(S_IDLE, OP_CREATE_PAIR_ADV), S_STARTING_PAIR_ADV, lunch_s_create_pair_adv},
     // Start the lunch beacon after receiving confirmation
     {S_OP(S_STARTING_LUNCH_ADV, OP_CREATE_LUNCH_CFM), S_ADV_STARTED, lunch_s_start_on},
@@ -514,19 +518,15 @@ static rep_vec_err_t user_appm_init(void)
 
         wurx_disable();
         atm_pm_lock(lock_hiber);
-        is_wurx = true;
-
-        // Check if we are holding button
-        lunch_button_check_on_boot();
+        
+        // Move state machine
+        atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
     } else {
         ATM_LOG(V, "Cold Boot");
 
         atm_pm_unlock(lock_hiber);
-        is_wurx = false;
     }
     
-    // Move state machine
-    atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
 
     return RV_DONE;
 }

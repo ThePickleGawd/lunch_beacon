@@ -11,6 +11,8 @@
  */
 #pragma once
 
+#include "atm_adv_param.h"
+
 typedef enum {
     S_INIT,
     S_IDLE,
@@ -57,3 +59,5 @@ typedef struct {
     // act_idx managed by adv api so we don't know if it's just 0 or 1, need to hash it here
     uint8_t act_idx[CFG_GAP_ADV_MAX_INST];
 } app_env_t;
+
+void testing_press_init(void);

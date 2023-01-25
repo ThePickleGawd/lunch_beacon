@@ -14,12 +14,15 @@
 #include "atm_button.h"
 #include "atm_vkey.h"
 #include "atm_utils_c.h"
-#include "lunch_button.h"
 #include "atm_pm.h"
 #include "atm_gpio.h"
 #include "sw_timer.h"
 #include "interrupt.h"
 #include "pinmux.h"
+
+// My stuff
+#include "lunch_beacon.h"
+#include "lunch_button.h"
 
 ATM_LOG_LOCAL_SETTING("lunch_button", V);
 
@@ -55,18 +58,15 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
 
 __FAST static void interrupt_hdlr(uint32_t mask)
 {
-    ATM_LOG(D, "BOY I WAS CALLED");
+    ATM_LOG(D, "Button Clicked");
+    testing_press_init();
+
     atm_gpio_set_int_disable(10);
     atm_gpio_clear_int_status(10);
 
     atm_gpio_int_set_rising(10);
     atm_gpio_set_int_enable(10);
 
-    sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
-}
-
-void lunch_button_check_on_boot(void)
-{
     sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
 }
 
