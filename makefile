@@ -50,6 +50,8 @@ CFLAGS += \
 	-DCFG_GAP_ADV_MAX_INST=2 \
 	-DGAP_ADV_PARM_NAME="cfg_adv_params.h" \
 	-DGAP_PARM_NAME="cfg_gap_params.h" \
+	-DATM_LOG_GLOBAL_LEVEL=ATM_LOG_V_MASK \
+
 
 # SRC
 SRC_TOP = src

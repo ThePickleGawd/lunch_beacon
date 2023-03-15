@@ -9,9 +9,14 @@
 
 // Units in dbm (ex. 0x04 = 4dbm or 0xFF = -1dbm)
 // For negative number 0xFF-val+1
-//#define CFG_ADV0_CREATE_MAX_TX_POWER 0xBA
+// 0xEC --> -20dbm
+#define CFG_ADV0_CREATE_MAX_TX_POWER 0x00
 #define CFG_ADV0_CREATE_PROPERTY ADV_LEGACY_NON_CONN_SCAN_MASK
-#define CFG_ADV0_START_DURATION 6000 // 60s (unit of 10ms) TODO: change
+#define CFG_ADV0_START_DURATION 30000 // 300s (unit of 10ms) TODO: change
+
+#define ADV0_INTERVAL 100 // ms
+#define CFG_ADV0_CREATE_INTERVAL_MIN ((uint32_t)ADV0_INTERVAL*1000/625)
+#define CFG_ADV0_CREATE_INTERVAL_MAX ((uint32_t)ADV0_INTERVAL*1000/625)
 
 #define CFG_ADV0_DATA_ADV_PAYLOAD \
     /* Complete service list: 0x2af5 = fixed string 16 */ \
@@ -26,12 +31,12 @@
 #define CFG_ADV0_DATA_SCANRSP_PAYLOAD \
     0x09,0xff,0x00,0x60,'A','T','M','B','L','E'
 
-    
 /*
  * ADV1 (Pairing Mode)
  *******************************************************************************
  */
 
+#define CFG_ADV1_CREATE_MAX_TX_POWER 0x00
 #define CFG_ADV1_CREATE_PROPERTY ADV_LEGACY_UNDIR_CONN_MASK
 #define CFG_ADV1_START_DURATION 3000 // 30s (unit of 10ms)
 

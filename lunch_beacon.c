@@ -22,6 +22,10 @@
 #include "atm_adv_param.h"
 #include "atm_adv.h"
 #include "atm_button.h"
+#include "at_apb_pseq_regs_core_macro.h"
+#include "at_wrpr.h"
+#include "base_addr.h"
+#include "pmu.h"
 
 // My stuff
 #include "lunch_beacon.h"
@@ -29,7 +33,7 @@
 #include "lunch_gatt.h"
 #include "lunch_nvds.h"
 
-ATM_LOG_LOCAL_SETTING("lunch_beacon", V);
+ATM_LOG_LOCAL_SETTING("lunch_beacon", D);
 
 /*
  * FUNCTION DECLARATIONS
@@ -113,7 +117,7 @@ static void gap_conn_ind(uint8_t conidx, atm_connect_info_t *param)
     ATM_LOG(D, "TODO: Reject connection if we already have one");
 
     // Set max transmit power for given connection
-    atm_ble_set_con_txpwr(conidx, CFG_ADV0_CREATE_MAX_TX_POWER);
+    atm_ble_set_con_txpwr(conidx, CFG_ADV1_CREATE_MAX_TX_POWER);
 
     // Accept connection and update state
     atm_gap_print_conn_param(param);
@@ -470,6 +474,8 @@ static void lunch_s_sleep(void)
 void testing_press_init(void)
 {
     ATM_LOG(W, "Testing purposes only! Init gap on button press");
+    atm_pm_lock(lock_hiber);
+
     if(atm_asm_get_current_state(S_TBL_IDX) == S_INIT)
         atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
 }
@@ -503,6 +509,13 @@ static const state_entry s_tbl[] = {
     {S_OP(S_ADV_STOPPED, OP_SLEEP), S_IDLE, lunch_s_sleep}
 };
 
+__FAST static rep_vec_err_t
+hib_test(bool *sleep, int32_t duration, uint32_t int_set)
+{
+    ATM_LOG(V, "%s:HIBERNATING!!!", __func__);
+    return RV_NEXT;
+}
+
 static rep_vec_err_t user_appm_init(void)
 {
     // Initialize state machine
@@ -512,6 +525,7 @@ static rep_vec_err_t user_appm_init(void)
 
     // Setup WuRX
     RV_PLF_PREVENT_HIBERNATION_ADD_LAST(wurx_adv_prevent_hib);
+    RV_PLF_HIBERNATE_ADD(hib_test);
 
     lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
 
@@ -529,7 +543,6 @@ static rep_vec_err_t user_appm_init(void)
 
         atm_pm_unlock(lock_hiber);
     }
-    
 
     return RV_DONE;
 }
@@ -538,6 +551,7 @@ int main(void)
 {
     // Initialize button
     lunch_button_init(button_press_cb);
+    pmu_socoff_wakeup_gpio(false);
 
     RV_APPM_INIT_ADD_LAST(user_appm_init);
 

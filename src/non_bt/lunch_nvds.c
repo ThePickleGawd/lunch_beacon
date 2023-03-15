@@ -17,7 +17,7 @@
 #include "atm_log.h"
 #include "co_utils.h"
 
-ATM_LOG_LOCAL_SETTING("lunch_nvds", D);
+ATM_LOG_LOCAL_SETTING("lunch_nvds", V);
 
 uint8_t nvds_get_lunch_data(nvds_lunch_data_t *out)
 {
