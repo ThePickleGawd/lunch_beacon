@@ -26,6 +26,7 @@
 #include "at_wrpr.h"
 #include "base_addr.h"
 #include "pmu.h"
+#include "ll.h"
 
 // My stuff
 #include "lunch_beacon.h"
@@ -471,15 +472,6 @@ static void lunch_s_sleep(void)
     atm_pm_unlock(lock_hiber);
 }
 
-void testing_press_init(void)
-{
-    ATM_LOG(W, "Testing purposes only! Init gap on button press");
-    atm_pm_lock(lock_hiber);
-
-    if(atm_asm_get_current_state(S_TBL_IDX) == S_INIT)
-        atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
-}
-
 // Once we create it and call the cfm
 // the ASM in atm_adv will callback with ADV_ON State or whatever
 
@@ -510,9 +502,9 @@ static const state_entry s_tbl[] = {
 };
 
 __FAST static rep_vec_err_t
-hib_test(bool *sleep, int32_t duration, uint32_t int_set)
+enter_hib(bool *sleep, int32_t duration, uint32_t int_set)
 {
-    ATM_LOG(V, "%s:HIBERNATING!!!", __func__);
+    ATM_LOG(D, "Entering Hibernation Mode");
     return RV_NEXT;
 }
 
@@ -525,13 +517,13 @@ static rep_vec_err_t user_appm_init(void)
 
     // Setup WuRX
     RV_PLF_PREVENT_HIBERNATION_ADD_LAST(wurx_adv_prevent_hib);
-    RV_PLF_HIBERNATE_ADD(hib_test);
+    RV_PLF_HIBERNATE_ADD(enter_hib);
 
     lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
 
     // Check if woken by WuRX
     if (!boot_was_cold()) {
-        ATM_LOG(V, "WuRX Boot");
+        ATM_LOG(D, "WuRX Boot");
 
         wurx_disable();
         atm_pm_lock(lock_hiber);
@@ -539,10 +531,11 @@ static rep_vec_err_t user_appm_init(void)
         // Move state machine
         atm_asm_move(S_TBL_IDX, OP_MODULE_INIT);
     } else {
-        ATM_LOG(V, "Cold Boot");
+        ATM_LOG(D, "Cold Boot");
 
         atm_pm_unlock(lock_hiber);
     }
+
 
     return RV_DONE;
 }

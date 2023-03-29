@@ -59,8 +59,7 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
 __FAST static void interrupt_hdlr(uint32_t mask)
 {
     ATM_LOG(D, "Button Clicked");
-    testing_press_init();
-
+    
     atm_gpio_set_int_disable(10);
     atm_gpio_clear_int_status(10);
 
