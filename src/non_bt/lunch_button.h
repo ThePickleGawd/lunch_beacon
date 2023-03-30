@@ -23,3 +23,10 @@ typedef void (*press_event_cb)(void);
  *******************************************************************************
  */
 void lunch_button_init(press_event_cb cb);
+
+/**
+ *******************************************************************************
+ * @brief Check if we are still pressing button when device is awoken
+ *******************************************************************************
+ */
+void lunch_button_on_wake(void);
