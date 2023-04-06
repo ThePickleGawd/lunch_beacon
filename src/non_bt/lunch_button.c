@@ -27,6 +27,7 @@
 ATM_LOG_LOCAL_SETTING("lunch_button", V);
 
 // Button Configuration
+#define BUTTON_PIN 10
 #define BTN_PRESS_MIN_TIME_CS 200
 #define BTN_CHECK_PRESS_INTERVAL_CS 20
 #define MAX_PRESS_CHECKS (BTN_PRESS_MIN_TIME_CS / BTN_CHECK_PRESS_INTERVAL_CS)
@@ -46,7 +47,7 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
         event_cb(); 
         check_press_counter = 0;
     } else {
-        if(atm_gpio_read_gpio(10) == 1) {
+        if(atm_gpio_read_gpio(BUTTON_PIN) == 1) {
             // Still pressing, keep checking
             sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
         } else {
@@ -59,28 +60,34 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
 __FAST static void interrupt_hdlr(uint32_t mask)
 {
     ATM_LOG(D, "Button Clicked");
-    
-    atm_gpio_set_int_disable(10);
-    atm_gpio_clear_int_status(10);
 
-    atm_gpio_int_set_rising(10);
-    atm_gpio_set_int_enable(10);
+    atm_gpio_set_int_disable(BUTTON_PIN);
+    atm_gpio_clear_int_status(BUTTON_PIN);
+
+    atm_gpio_int_set_rising(BUTTON_PIN);
+    atm_gpio_set_int_enable(BUTTON_PIN);
 
     sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
 }
 
 void lunch_button_init(press_event_cb cb)
 {
+    // Register timer and callback
 	event_cb = cb;
     check_press_tid = sw_timer_alloc(check_press, NULL);
 
-    atm_gpio_setup(10);
-    atm_gpio_set_input(10);
+    // Setup GPIO for button
+    atm_gpio_setup(BUTTON_PIN);
+    atm_gpio_set_input(BUTTON_PIN);
 
-    interrupt_install_gpio(10, 3, interrupt_hdlr);    
+    interrupt_install_gpio(BUTTON_PIN, 3, interrupt_hdlr);    
 
-    atm_gpio_int_set_rising(10);
-    atm_gpio_set_int_enable(10);
+    atm_gpio_int_set_rising(BUTTON_PIN);
+    atm_gpio_set_int_enable(BUTTON_PIN);
+}
 
+void lunch_button_on_wake(void) {
+    // We could be awaken by a press, so check here
+    sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
 }
 

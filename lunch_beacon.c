@@ -34,7 +34,7 @@
 #include "lunch_gatt.h"
 #include "lunch_nvds.h"
 
-ATM_LOG_LOCAL_SETTING("lunch_beacon", D);
+ATM_LOG_LOCAL_SETTING("lunch_beacon", V);
 
 /*
  * FUNCTION DECLARATIONS
@@ -48,10 +48,6 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
  * DEFINES
  *******************************************************************************
  */
-
-#ifndef PAIR_BUTTON_PIN
-#define PAIR_BUTTON_PIN 10
-#endif
 
 #define S_TBL_IDX 0
 
@@ -521,9 +517,12 @@ static rep_vec_err_t user_appm_init(void)
 
     lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
 
-    // Check if woken by WuRX
+    // Check if woken by WuRX or button
     if (!boot_was_cold()) {
         ATM_LOG(D, "WuRX Boot");
+
+        // Check if we are pressing button
+        lunch_button_on_wake();
 
         wurx_disable();
         atm_pm_lock(lock_hiber);
@@ -544,7 +543,6 @@ int main(void)
 {
     // Initialize button
     lunch_button_init(button_press_cb);
-    pmu_socoff_wakeup_gpio(false);
 
     RV_APPM_INIT_ADD_LAST(user_appm_init);
 

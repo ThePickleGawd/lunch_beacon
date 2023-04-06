@@ -14,26 +14,26 @@
 #include "atm_adv_param.h"
 
 typedef enum {
-    S_INIT,
-    S_IDLE,
-    S_STARTING_LUNCH_ADV,
-    S_STARTING_PAIR_ADV,
-    S_ADV_STARTED,
-    S_ADV_STOPPED,
-    S_CONNECTED,
+    S_INIT,               // 0
+    S_IDLE,               // 1
+    S_STARTING_LUNCH_ADV, // 2
+    S_STARTING_PAIR_ADV,  // 3
+    S_ADV_STARTED,        // 4
+    S_ADV_STOPPED,        // 5
+    S_CONNECTED,          // 6
 } APP_STATE;
 
 typedef enum {
-    OP_MODULE_INIT,
-    OP_CREATE_LUNCH_ADV,
-    OP_CREATE_PAIR_ADV,
-    OP_DELETE_PAIR_ADV,
-    OP_CREATE_LUNCH_CFM,
-    OP_CREATE_PAIR_CFM,
-    OP_SLEEP,
-    OP_ADV_TIMEOUT,
-    OP_CONNECTED,
-    OP_DISCONNECTED,
+    OP_MODULE_INIT,       // 0
+    OP_CREATE_LUNCH_ADV,  // 1
+    OP_CREATE_PAIR_ADV,   // 2
+    OP_DELETE_PAIR_ADV,   // 3
+    OP_CREATE_LUNCH_CFM,  // 4
+    OP_CREATE_PAIR_CFM,   // 5
+    OP_SLEEP,             // 6
+    OP_ADV_TIMEOUT,       // 7
+    OP_CONNECTED,         // 8
+    OP_DISCONNECTED,      // 9
     OP_END = 0xFF
 } APP_OP;
 
