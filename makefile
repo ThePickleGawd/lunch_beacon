@@ -3,6 +3,7 @@ include ../../user/common.mk
 BOARD=m2202
 DEBUG := 1
 FORCE_LPC_RCOS:=1
+LPC_RCOS:=1
 
 DRIVERS := \
 	interrupt \
