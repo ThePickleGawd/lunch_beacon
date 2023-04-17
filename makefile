@@ -4,6 +4,7 @@ BOARD=m2202
 DEBUG := 1
 FORCE_LPC_RCOS:=1
 LPC_RCOS:=1
+WURX := 0
 
 DRIVERS := \
 	interrupt \
@@ -15,7 +16,7 @@ DRIVERS := \
 	atm_button \
 	atm_vkey \
 	sw_event \
-	wurx \
+	lunch \
 
 LIBRARIES := prf
 
@@ -41,7 +42,6 @@ CFLAGS += \
 	-DCFG_NO_GAP_SCAN \
 	-DCFG_NO_GATTC \
 	-DPINMAP_$(BOARD)_OVERLAY="pinmap_$(BOARD)_overlay.h" \
-	-DCFG_WURX_FROM_FLASH_NVDS \
 
 # Predefined header adv stuff
 CFLAGS += \
@@ -52,7 +52,16 @@ CFLAGS += \
 	-DCFG_GAP_ADV_MAX_INST=2 \
 	-DGAP_ADV_PARM_NAME="cfg_adv_params.h" \
 	-DGAP_PARM_NAME="cfg_gap_params.h" \
-	-DATM_LOG_GLOBAL_LEVEL=ATM_LOG_V_MASK \
+
+# -DCFG_GAP_PARAM_CONST=0 \
+# -DCFG_GAP_PRIVACY_CFG=1 \
+
+ifeq ($(WURX), 1)
+# Enable wakeup rx
+DRIVERS += wurx
+CFLAGS += -DCFG_WURX_FROM_FLASH_NVDS -DCFG_WURX
+flash_nvds.data += b4-PMU_WURX/high_duty_adv
+endif
 
 
 # SRC
@@ -67,9 +76,8 @@ C_SRCS += \
 
 flash_nvds.data := \
 	d0-LUNCH_DATA/default \
-	01-BD_ADDRESS/beacon_201 \
 	11-SLEEP_ENABLE/hib \
 	12-EXT_WAKEUP_ENABLE/enable2 \
-	b4-PMU_WURX/high_duty_adv \
+	01-BD_ADDRESS/beacon_201 \
 
 include $(COMMON_USER_DIR)/framework.mk

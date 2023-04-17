@@ -169,9 +169,12 @@ static const atm_gap_cbs_t gap_callbacks = {
 __FAST static rep_vec_err_t
 wurx_adv_prevent_hib(bool *prevent, int32_t *pseq_dur, int32_t ble_dur)
 {
+    #ifndef DISABLE_WURX
     if (!boot_was_cold()) {
+        ATM_LOG(D, "Enabling WuRX");
 	    wurx_enable();
     }
+    #endif
     return RV_NEXT;
 }
 
@@ -357,6 +360,9 @@ static void lunch_s_init(void)
     // Create gatt profile
     lunch_atts_create_prf();
     atm_gap_prf_reg(BLE_ATMPRFS_MODULE_NAME, NULL); 
+
+    // Assign Random Static ADDR
+    // atm_gap_gen_rand_addr(BLE_GAP_STATIC_ADDR);
 
     // Start gap
     atm_gap_start(atm_gap_param_get(), &gap_callbacks);

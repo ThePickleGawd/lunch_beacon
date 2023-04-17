@@ -1,0 +1,514 @@
+Over 7:30 hours
+
+@04f1465d LPC active 32102Hz
+@04f3c7a7 LPC active 32104Hz
+@04f648ef LPC active 32102Hz
+@04f8ca3d LPC retain 32738Hz
+@04fdccd7 LPC active 32103Hz
+@05004e29 LPC active 32104Hz
+@0502d019 LPC active 32103Hz
+@0502d07b LPC retain 32735Hz
+@050551fb LPC retain 32737Hz
+@0507d345 LPC active 32102Hz
+@0507d3a7 LPC retain 32739Hz
+@050a549f LPC retain 32740Hz
+@050cd5fd LPC retain 32738Hz
+@050f574d LPC retain 32736Hz
+@0511d895 LPC retain 32740Hz
+@05145b6d LPC retain 32739Hz
+@0516dc87 LPC active 32103Hz
+@0516dce9 LPC retain 32737Hz
+@05195dd3 LPC active 32096Hz
+@05195e35 LPC retain 32733Hz
+@051bdf11 LPC active 32099Hz
+@051bdf73 LPC retain 32734Hz
+@051e6051 LPC active 32107Hz
+@051e60b3 LPC retain 32736Hz
+@0520e19b LPC active 32104Hz
+@05236499 LPC active 32095Hz
+@052364fb LPC retain 32731Hz
+@052867c1 LPC active 32102Hz
+@05286823 LPC retain 32739Hz
+@052ae915 LPC active 32104Hz
+@052ae977 LPC retain 32737Hz
+@052d6a61 LPC active 32105Hz
+@052d6ac3 LPC retain 32736Hz
+@052feba5 LPC active 32104Hz
+@052fec07 LPC retain 32738Hz
+@05326cf5 LPC retain 32737Hz
+@0534ee43 LPC active 32102Hz
+@0534eea5 LPC retain 32736Hz
+@05377115 LPC active 32101Hz
+@05377177 LPC retain 32740Hz
+@0539f225 LPC active 32104Hz
+@053c737b LPC retain 32739Hz
+@053ef4cb LPC active 32102Hz
+@053ef52d LPC retain 32740Hz
+@05417625 LPC active 32101Hz
+@05417687 LPC retain 32737Hz
+@0543f765 LPC active 32102Hz
+@0543f7c7 LPC retain 32735Hz
+@054678a9 LPC active 32101Hz
+@0546790b LPC retain 32736Hz
+@0548f9e7 LPC active 32100Hz
+@0548fa49 LPC retain 32739Hz
+@054b7b39 LPC active 32102Hz
+@054b7b9b LPC retain 32741Hz
+@054dfc97 LPC active 32104Hz
+@054dfcf9 LPC retain 32736Hz
+@05507ddd LPC active 32102Hz
+@05507e3f LPC retain 32735Hz
+@0552ff1b LPC active 32105Hz
+@0552ff7d LPC retain 32738Hz
+@055801c1 LPC active 32100Hz
+@055a830b LPC active 32099Hz
+@055a836d LPC retain 32737Hz
+@055d0457 LPC active 32102Hz
+@055d04b9 LPC retain 32736Hz
+@055f859b LPC retain 32738Hz
+@056206e5 LPC active 32103Hz
+@056488d1 LPC retain 32737Hz
+@05670ac5 LPC active 32104Hz
+@05670b27 LPC retain 32738Hz
+@0568ddc8 [   atm_adv][D]: Adv0: OFF (0x406)
+@0568de6d [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=7
+@0568df54 [lunch_beac][V]: ASM State Change from 4 to 5, with OP Code 7
+@0568e048 [lunch_beac][V]: lunch_s_timeout
+@0568e0e4 [lunch_beac][V]: ASM State Change from 5 to 1, with OP Code 6
+@05698afb [lunch_beac][D]: Entering Hibernation Mode
+@060633ed SDK Version: 5.3.0
+@06063446 APP Version: 0.0.0.9
+5x5 Stacked flash: 4e 56 44 53 d0 02 10 47 55 4e 4e 00 00 39 35 30 ...
+@060635b4 boot_status = 8000005
+@06063615 Hiberation wakeup
+@06063678 [lunch_beac][D]: user_main() done
+@0606374f [lunch_beac][V]: ASM State Change from 0 to 0, with OP Code 255
+@0606384d [lunch_beac][D]: WuRX Boot
+@060638db [lunch_beac][V]: ASM State Change from 0 to 1, with OP Code 0
+@060639cc [lunch_beac][V]: lunch_s_init
+@06063a5f [lunch_gatt][D]: lunch_atts_create_prf:
+@06063b26 [lunch_gatt][D]: lunch_atts_create_prf: SVC (0), RW_STUDENT_ID (2), RW_SCHOOL_ID (4) CCCD (5)
+@06063c94 WURX triggered 0x400
+@06063dd1 [lunch_beac][V]: gap_init_cfm
+@06063e68 [lunch_beac][V]: ASM State Change from 1 to 2, with OP Code 1
+@06063f5c [lunch_beac][V]: lunch_s_create_lunch_adv
+@06064033 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=2
+@06064117 [lunch_beac][D]: ATM_ADV_CREATED act_idx=0
+@060641d0 [lunch_beac][V]: ble_adv_create_cfm
+@06064278 [lunch_beac][D]: Found Lunch Data - School ID: GUNN - Student ID: 95012345
+@0606438d [lunch_beac][D]: NEW ADV DATA: õ**õ*GUNN95012345
+@06064465 [   atm_adv][D]: no path to update vaid
+@06064515 actv_idx: 0 len: 24
+@06064578 actv_idx: 0 len: 10
+@060645f1 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=4
+@060646ea [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=6
+@060647ec [   atm_adv][D]: Adv0: ON
+@06064877 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=9
+@0606495d [lunch_beac][V]: ASM State Change from 2 to 4, with OP Code 4
+@06064a50 [lunch_beac][V]: lunch_s_start_on
+@06064aef [lunch_beac][V]: ASM State Change from 4 to 4, with OP Code 255
+@06064d21 LPC active 32100Hz
+@06064d83 LPC retain 32737Hz
+@0608ceeb LPC active 32099Hz
+@060b503b LPC active 32096Hz
+@060b509d LPC retain 32733Hz
+@060dd175 LPC active 32098Hz
+@060dd1d7 LPC retain 32734Hz
+@061052b1 LPC active 32099Hz
+@06105313 LPC retain 32738Hz
+@0612d3fb LPC retain 32736Hz
+@06155547 LPC active 32100Hz
+@061555a9 LPC retain 32737Hz
+@0617d697 LPC active 32103Hz
+@0617d6f9 LPC retain 32738Hz
+@061a58e9 LPC active 32104Hz
+@061a594b LPC retain 32739Hz
+@061cda7d LPC active 32103Hz
+@061cdadf LPC retain 32738Hz
+@061f5c1d LPC active 32105Hz
+@0621dd21 LPC active 32102Hz
+@0621dd83 LPC retain 32736Hz
+@06245e5f LPC active 32099Hz
+@06245ec1 LPC retain 32734Hz
+@0626e0b1 LPC active 32101Hz
+@0626e113 LPC retain 32737Hz
+@06296225 LPC active 32102Hz
+@06296287 LPC retain 32739Hz
+@062be379 LPC active 32101Hz
+@062be3db LPC retain 32738Hz
+@0630e623 LPC retain 32736Hz
+@06336769 LPC active 32102Hz
+@063367cb LPC retain 32735Hz
+@0635e8ab LPC active 32104Hz
+@0635e90d LPC retain 32737Hz
+@063869ed LPC active 32103Hz
+@06386a4f LPC retain 32739Hz
+@063aeb41 LPC active 32100Hz
+@063aeba3 LPC retain 32737Hz
+@063d6e43 LPC retain 32734Hz
+@063ff055 LPC active 32096Hz
+@063ff0b7 LPC retain 32731Hz
+@06427183 LPC active 32098Hz
+@064271e5 LPC retain 32736Hz
+@0644f2cb LPC active 32106Hz
+@0644f32d LPC retain 32743Hz
+@06477431 LPC active 32102Hz
+@06477493 LPC retain 32739Hz
+@0649f57b LPC active 32099Hz
+@0649f5dd LPC retain 32736Hz
+@064c76c1 LPC active 32103Hz
+@064c7723 LPC retain 32737Hz
+@064ef807 LPC active 32105Hz
+@064ef869 LPC retain 32738Hz
+@0653faa1 LPC active 32107Hz
+@0653fb03 LPC retain 32736Hz
+@06567be5 LPC active 32104Hz
+@0658fd33 LPC active 32102Hz
+@0658fd95 LPC retain 32739Hz
+@066082d1 LPC active 32106Hz
+@06608333 LPC retain 32737Hz
+@066303bf LPC active 32108Hz
+@06630421 LPC retain 32738Hz
+@06658509 LPC active 32102Hz
+@0668065d LPC retain 32739Hz
+@066a87b3 LPC active 32105Hz
+@066a8815 LPC retain 32741Hz
+@066d0909 LPC active 32102Hz
+@066d096b LPC retain 32738Hz
+@066f8b6b LPC active 32100Hz
+@066f8bcd LPC retain 32734Hz
+@06720ccd LPC active 32101Hz
+@06720d2f LPC retain 32735Hz
+@06748e13 LPC active 32104Hz
+@06748e75 LPC retain 32738Hz
+@067990b1 LPC active 32099Hz
+@06799113 LPC retain 32735Hz
+@067c11f1 LPC active 32098Hz
+@067c1253 LPC retain 32734Hz
+@067e9325 LPC active 32102Hz
+@067e9387 LPC retain 32738Hz
+@06811467 LPC active 32103Hz
+@068114c9 LPC retain 32741Hz
+@06839661 LPC retain 32740Hz
+@0686185f LPC active 32101Hz
+@068618c1 LPC retain 32737Hz
+@068b1aff LPC active 32104Hz
+@068b1b61 LPC retain 32739Hz
+@068d9c4d LPC retain 32738Hz
+@06929f9d LPC retain 32740Hz
+@0695224d LPC retain 32739Hz
+@0697a419 LPC active 32105Hz
+@069a2567 LPC active 32106Hz
+@069a25c9 LPC retain 32740Hz
+@069bf154 [   atm_adv][D]: Adv0: OFF (0x406)
+@069bf1fa [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=7
+@069bf2e1 [lunch_beac][V]: ASM State Change from 4 to 5, with OP Code 7
+@069bf3d4 [lunch_beac][V]: lunch_s_timeout
+@069bf471 [lunch_beac][V]: ASM State Change from 5 to 1, with OP Code 6
+@069ca5b1 [lunch_beac][D]: Entering Hibernation Mode
+@069ca713 SDK Version: 5.3.0
+@069ca76c APP Version: 0.0.0.9
+5x5 Stacked flash: 4e 56 44 53 d0 02 10 47 55 4e 4e 00 00 39 35 30 ...
+@069ca8da boot_status = 8000005
+@069ca93b Hiberation wakeup
+@069ca99e [lunch_beac][D]: user_main() done
+@069caa75 [lunch_beac][V]: ASM State Change from 0 to 0, with OP Code 255
+@069cab73 [lunch_beac][D]: WuRX Boot
+@069cac01 [lunch_beac][V]: ASM State Change from 0 to 1, with OP Code 0
+@069cacf2 [lunch_beac][V]: lunch_s_init
+@069cad85 [lunch_gatt][D]: lunch_atts_create_prf:
+@069cae4c [lunch_gatt][D]: lunch_atts_create_prf: SVC (0), RW_STUDENT_ID (2), RW_SCHOOL_ID (4) CCCD (5)
+@069cafba WURX triggered 0x400
+@069cb0f7 [lunch_beac][V]: gap_init_cfm
+@069cb18e [lunch_beac][V]: ASM State Change from 1 to 2, with OP Code 1
+@069cb282 [lunch_beac][V]: lunch_s_create_lunch_adv
+@069cb359 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=2
+@069cb43d [lunch_beac][D]: ATM_ADV_CREATED act_idx=0
+@069cb4f6 [lunch_beac][V]: ble_adv_create_cfm
+@069cb59e [lunch_beac][D]: Found Lunch Data - School ID: GUNN - Student ID: 95012345
+@069cb6b4 [lunch_beac][D]: NEW ADV DATA: õ**õ*GUNN95012345
+@069cb78b [   atm_adv][D]: no path to update vaid
+@069cb83b actv_idx: 0 len: 24
+@069cb89e actv_idx: 0 len: 10
+@069cb917 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=4
+@069cba10 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=6
+@069cbb12 [   atm_adv][D]: Adv0: ON
+@069cbb9d [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=9
+@069cbc83 [lunch_beac][V]: ASM State Change from 2 to 4, with OP Code 4
+@069cbd77 [lunch_beac][V]: lunch_s_start_on
+@069cbe15 [lunch_beac][V]: ASM State Change from 4 to 4, with OP Code 255
+@069cc047 LPC active 32099Hz
+@069cc0a9 LPC retain 32735Hz
+@069f4213 LPC active 32100Hz
+@06a1c34b LPC active 32102Hz
+@06a1c3ad LPC retain 32736Hz
+@06a4448f LPC active 32103Hz
+@06a444f1 LPC retain 32738Hz
+@06a6c5df LPC active 32102Hz
+@06a6c641 LPC retain 32737Hz
+@06a9472b LPC active 32105Hz
+@06a9478d LPC retain 32739Hz
+@06abc885 LPC retain 32740Hz
+@06ae49dd LPC retain 32736Hz
+@06b0cb21 LPC retain 32735Hz
+@06b34c63 LPC active 32101Hz
+@06b5cda3 LPC active 32102Hz
+@06b5ce05 LPC retain 32738Hz
+@06bad047 LPC active 32101Hz
+@06bad0a9 LPC retain 32739Hz
+@06bd5197 LPC active 32102Hz
+@06bd51f9 LPC retain 32744Hz
+@06bfd305 LPC active 32105Hz
+@06bfd367 LPC retain 32742Hz
+@06c25469 LPC active 32106Hz
+@06c254cb LPC retain 32737Hz
+@06c4d5b5 LPC active 32104Hz
+@06c756ff LPC active 32103Hz
+@06c75761 LPC retain 32739Hz
+@06c9d84b LPC retain 32736Hz
+@06cc5997 LPC active 32104Hz
+@06cedae3 LPC retain 32739Hz
+@06d15c37 LPC active 32106Hz
+@06d15c99 LPC retain 32737Hz
+@06d3dd75 LPC active 32103Hz
+@06d65ebb LPC active 32102Hz
+@06d65f1d LPC retain 32740Hz
+@06d8e015 LPC active 32104Hz
+@06db6169 LPC active 32105Hz
+@06db61cb LPC retain 32737Hz
+@06dde2af LPC retain 32739Hz
+@06e06407 LPC active 32104Hz
+@06e06469 LPC retain 32742Hz
+@06e2e649 LPC retain 32739Hz
+@06e56849 LPC active 32105Hz
+@06e568ab LPC retain 32738Hz
+@06ecf031 LPC retain 32740Hz
+@06ef7251 LPC active 32106Hz
+@06ef72b3 LPC retain 32738Hz
+@06f1f399 LPC active 32105Hz
+@06f1f3fb LPC retain 32736Hz
+@06f474d5 LPC active 32107Hz
+@06f47537 LPC retain 32737Hz
+@06f6f621 LPC active 32108Hz
+@06f6f682 LPC retain 32739Hz
+@06f97775 LPC active 32101Hz
+@06f977d7 LPC retain 32737Hz
+@06fbf8bb LPC active 32099Hz
+@06fbf91d LPC retain 32736Hz
+@06fe7a01 LPC active 32104Hz
+@06fe7a63 LPC retain 32738Hz
+@0700fb55 LPC active 32101Hz
+@07037ca1 LPC retain 32737Hz
+@0705fdeb LPC active 32108Hz
+@0705fe4d LPC retain 32741Hz
+@07087f4b LPC active 32110Hz
+@07087fad LPC retain 32743Hz
+@070b027b LPC active 32108Hz
+@070b02dd LPC retain 32739Hz
+@070d851b LPC active 32106Hz
+@070d857d LPC retain 32738Hz
+@0710071f LPC active 32102Hz
+@07100781 LPC retain 32736Hz
+@07128869 LPC active 32101Hz
+@071288cb LPC retain 32735Hz
+@071509a5 LPC active 32102Hz
+@07150a07 LPC retain 32739Hz
+@07178af1 LPC active 32101Hz
+@07178b53 LPC retain 32740Hz
+@071c8da3 LPC active 32104Hz
+@071c8e05 LPC retain 32741Hz
+@071f0efb LPC active 32106Hz
+@071f0f5d LPC retain 32740Hz
+@07219053 LPC active 32104Hz
+@072190b5 LPC retain 32737Hz
+@07241199 LPC active 32103Hz
+@072692e3 LPC active 32101Hz
+@07269345 LPC retain 32738Hz
+@07291435 LPC active 32102Hz
+@07291497 LPC retain 32737Hz
+@072b9587 LPC active 32104Hz
+@072b95e8 LPC retain 32738Hz
+@072e16cf LPC active 32102Hz
+@072e1731 LPC retain 32737Hz
+@07326758 [   atm_adv][D]: Adv0: OFF (0x406)
+@073267fe [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=7
+@073268e5 [lunch_beac][V]: ASM State Change from 4 to 5, with OP Code 7
+@073269d8 [lunch_beac][V]: lunch_s_timeout
+@07326a75 [lunch_beac][V]: ASM State Change from 5 to 1, with OP Code 6
+@07331850 [lunch_beac][D]: Entering Hibernation Mode
+@2536e822 SDK Version: 5.3.0
+@2536e87b APP Version: 0.0.0.9
+5x5 Stacked flash: 4e 56 44 53 d0 02 10 47 55 4e 4e 00 00 39 35 30 ...
+@2536e9e7 boot_status = 8000005
+@2536ea47 Hiberation wakeup
+@2536eaaa [lunch_beac][D]: user_main() done
+@2536eb80 [lunch_beac][V]: ASM State Change from 0 to 0, with OP Code 255
+@2536ec7d [lunch_beac][D]: WuRX Boot
+@2536ed0a [lunch_beac][V]: ASM State Change from 0 to 1, with OP Code 0
+@2536edfb [lunch_beac][V]: lunch_s_init
+@2536ee8d [lunch_gatt][D]: lunch_atts_create_prf:
+@2536ef53 [lunch_gatt][D]: lunch_atts_create_prf: SVC (0), RW_STUDENT_ID (2), RW_SCHOOL_ID (4) CCCD (5)
+@2536f0bf WURX triggered 0x400
+@2536f1fc [lunch_beac][V]: gap_init_cfm
+@2536f292 [lunch_beac][V]: ASM State Change from 1 to 2, with OP Code 1
+@2536f385 [lunch_beac][V]: lunch_s_create_lunch_adv
+@2536f45b [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=2
+@2536f53f [lunch_beac][D]: ATM_ADV_CREATED act_idx=0
+@2536f5f6 [lunch_beac][V]: ble_adv_create_cfm
+@2536f69d [lunch_beac][D]: Found Lunch Data - School ID: GUNN - Student ID: 95012345
+@2536f7b2 [lunch_beac][D]: NEW ADV DATA: õ**õ*GUNN95012345
+@2536f889 [   atm_adv][D]: no path to update vaid
+@2536f938 actv_idx: 0 len: 24
+@2536f99b actv_idx: 0 len: 10
+@2536fa13 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=4
+@2536fb0b [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=6
+@2536fc0c [   atm_adv][D]: Adv0: ON
+@2536fc96 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=9
+@2536fd7f [lunch_beac][V]: ASM State Change from 2 to 4, with OP Code 4
+@2536fe72 [lunch_beac][V]: lunch_s_start_on
+@2536ff0f [lunch_beac][V]: ASM State Change from 4 to 4, with OP Code 255
+@2537013f LPC active 32029Hz
+@253701a0 LPC retain 32672Hz
+@2539830f LPC retain 32675Hz
+@253c046b LPC active 32031Hz
+@253c04cc LPC retain 32677Hz
+@253e85cf LPC retain 32676Hz
+@2541072d LPC retain 32677Hz
+@254609ef LPC active 32026Hz
+@254b0cb5 LPC active 32025Hz
+@254b0d16 LPC retain 32676Hz
+@254d8e0d LPC active 32026Hz
+@254d8e6e LPC retain 32678Hz
+@25500f73 LPC active 32030Hz
+@25500fd4 LPC retain 32679Hz
+@255290db LPC active 32031Hz
+@2552913c LPC retain 32678Hz
+@2555123f LPC active 32029Hz
+@2557939d LPC active 32026Hz
+@255793fe LPC retain 32676Hz
+@255a14f5 LPC active 32025Hz
+@255a1556 LPC retain 32675Hz
+@255c964f LPC active 32027Hz
+@255c96b0 LPC retain 32677Hz
+@255f17af LPC active 32029Hz
+@25619913 LPC retain 32678Hz
+@25641a7b LPC active 32028Hz
+@25669be7 LPC retain 32676Hz
+@25691d49 LPC active 32027Hz
+@25691daa LPC retain 32674Hz
+@256b9e9f LPC active 32025Hz
+@256e1ff3 LPC active 32027Hz
+@2570a141 LPC active 32029Hz
+@25732291 LPC active 32028Hz
+@257322f2 LPC retain 32676Hz
+@2575a3e9 LPC active 32029Hz
+@2575a44a LPC retain 32677Hz
+@25782545 LPC active 32027Hz
+@257aa6d7 LPC retain 32676Hz
+@257d296d LPC active 32030Hz
+@257d29ce LPC retain 32675Hz
+@257faa9d LPC active 32028Hz
+@257faafe LPC retain 32677Hz
+@25822bf1 LPC active 32026Hz
+@2584ad51 LPC retain 32678Hz
+@25872eb3 LPC active 32027Hz
+@25872f14 LPC retain 32679Hz
+@2589b015 LPC active 32029Hz
+@2589b076 LPC retain 32677Hz
+@258c3175 LPC retain 32678Hz
+@25913435 LPC active 32026Hz
+@25913496 LPC retain 32675Hz
+@259636eb LPC active 32030Hz
+@2596374c LPC retain 32678Hz
+@2598b84d LPC active 32032Hz
+@259b39ad LPC active 32031Hz
+@259b3a0e LPC retain 32675Hz
+@259dbb05 LPC active 32028Hz
+@25a03c59 LPC active 32027Hz
+@25a03cba LPC retain 32676Hz
+@25a2bdb7 LPC retain 32674Hz
+@25a53f0d LPC retain 32676Hz
+@25a7c06b LPC active 32025Hz
+@25a7c0cc LPC retain 32675Hz
+@25aa41c3 LPC active 32024Hz
+@25aa4224 LPC retain 32672Hz
+@25acc30f LPC active 32026Hz
+@25af4453 LPC active 32028Hz
+@25af44b4 LPC retain 32676Hz
+@25b1c637 LPC active 32029Hz
+@25b1c697 LPC retain 32679Hz
+@25b44851 LPC active 32027Hz
+@25b448b2 LPC retain 32676Hz
+@25b6c9a5 LPC active 32019Hz
+@25b6ca06 LPC retain 32669Hz
+@25b94ae1 LPC active 32022Hz
+@25b94b42 LPC retain 32670Hz
+@25bbcce5 LPC active 32028Hz
+@25bbcd46 LPC retain 32677Hz
+@25be4ec7 LPC active 32025Hz
+@25be4f28 LPC retain 32675Hz
+@25c0d01b LPC active 32026Hz
+@25c0d07c LPC retain 32673Hz
+@25c3516b LPC active 32029Hz
+@25c351cc LPC retain 32677Hz
+@25c5d2d1 LPC retain 32678Hz
+@25c85435 LPC retain 32674Hz
+@25cad585 LPC active 32022Hz
+@25cad5e6 LPC retain 32667Hz
+@25cc6409 [   atm_adv][D]: Adv0: OFF (0x406)
+@25cc64ae [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=7
+@25cc6593 [lunch_beac][V]: ASM State Change from 4 to 5, with OP Code 7
+@25cc6686 [lunch_beac][V]: lunch_s_timeout
+@25cc6722 [lunch_beac][V]: ASM State Change from 5 to 1, with OP Code 6
+@25cd55ad [lunch_beac][D]: Entering Hibernation Mode
+@3b3f4a2e SDK Version: 5.3.0
+@3b3f4a86 APP Version: 0.0.0.9
+5x5 Stacked flash: 4e 56 44 53 d0 02 10 47 55 4e 4e 00 00 39 35 30 ...
+@3b3f4bf3 boot_status = 8000005
+@3b3f4c53 Hiberation wakeup
+@3b3f4cb5 [lunch_beac][D]: user_main() done
+@3b3f4d8b [lunch_beac][V]: ASM State Change from 0 to 0, with OP Code 255
+@3b3f4e87 [lunch_beac][D]: WuRX Boot
+@3b3f4f14 [lunch_beac][V]: ASM State Change from 0 to 1, with OP Code 0
+@3b3f5005 [lunch_beac][V]: lunch_s_init
+@3b3f5097 [lunch_gatt][D]: lunch_atts_create_prf:
+@3b3f515c [lunch_gatt][D]: lunch_atts_create_prf: SVC (0), RW_STUDENT_ID (2), RW_SCHOOL_ID (4) CCCD (5)
+@3b3f52c8 WURX triggered 0x400
+@3b3f5404 [lunch_beac][V]: gap_init_cfm
+@3b3f549a [lunch_beac][V]: ASM State Change from 1 to 2, with OP Code 1
+@3b3f558c [lunch_beac][V]: lunch_s_create_lunch_adv
+@3b3f5662 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=2
+@3b3f5745 [lunch_beac][D]: ATM_ADV_CREATED act_idx=0
+@3b3f57fc [lunch_beac][V]: ble_adv_create_cfm
+@3b3f58a3 [lunch_beac][D]: Found Lunch Data - School ID: GUNN - Student ID: 95012345
+@3b3f59b8 [lunch_beac][D]: NEW ADV DATA: õ**õ*GUNN95012345
+@3b3f5a8e [   atm_adv][D]: no path to update vaid
+@3b3f5b3d actv_idx: 0 len: 24
+@3b3f5b9f actv_idx: 0 len: 10
+@3b3f5c17 [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=4
+@3b3f5d0f [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=6
+@3b3f5e10 [   atm_adv][D]: Adv0: ON
+@3b3f5e9a [lunch_beac][V]: adv_state_change: act_idx=0 adv_state=9
+@3b3f5f7e [lunch_beac][V]: ASM State Change from 2 to 4, with OP Code 4
+@3b3f6070 [lunch_beac][V]: lunch_s_start_on
+@3b3f610e [lunch_beac][V]: ASM State Change from 4 to 4, with OP Code 255
+@3b3f633d LPC active 31971Hz
+@3b3f639e LPC retain 32631Hz
+@3b41e446 LPC active 31970Hz
+@3b41e4a7 LPC retain 32629Hz
+@3b446604 LPC active 31971Hz
+@3b46e7bc LPC active 31972Hz
+@3b46e81d LPC retain 32630Hz
+@3b496972 LPC active 31974Hz
+@3b4969d3 LPC retain 32631Hz
+@3b4beb22 LPC active 31975Hz
+@3b4beb83 LPC retain 32634Hz
+@3b4e6ce4 LPC active 31974Hz
+@3b4e6d45 LPC retain 32631Hz
+@3b50ee9a LPC retain 32630Hz
+@3b53704e LPC retain 32633Hz
+@3b55f214 LPC active 31975Hz
+@3b55f275 LPC retain 32632Hz
+@3b5af59e LPC retain 32634Hz
+@3b5d776a LPC active 31977Hz
+@3b5d77cb LPC retain 32635Hz
