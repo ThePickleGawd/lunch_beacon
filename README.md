@@ -34,7 +34,7 @@ stateDiagram
 
 ## Setup Locally
 
-You'll need the Atmosic SDK, though I'm not sure if that is publically avaliable. Place this repo such that the path is as follows:
+You'll need the Atmosic SDK, though I'm not sure if that is publically avaliable. Place this repo such that the relative path is as follows:
 
 atmosic_sdk/platform/atm2/ATM22xx-x1x/examples/lunch_beacon
 
@@ -46,6 +46,23 @@ make
 
 # Compile and Program Chip
 make run_all
+
+# Disable WuRX (Wake Up Receiver)
+make run_all WURX:=0
+
+# Disable Debug
+make run_all DEBUG:=0
+
+# With external 32khz crystal
+make run_all FORCE_LPC_RCOS:=0 LPC_RCOS:=0
+```
+
+## Mass Programming
+
+There is a python script in the "program" folder that can help with assigning unique Bluetooth MAC addresses. This script was tested with Python 3.9.9, but should work with later versions as well. To use, plug in the LunchTrak Beacon to the computer and run:
+
+```bash
+python program/program.py
 ```
 
 ## Atmosic SDK Workaround

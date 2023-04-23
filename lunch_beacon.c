@@ -169,12 +169,10 @@ static const atm_gap_cbs_t gap_callbacks = {
 __FAST static rep_vec_err_t
 wurx_adv_prevent_hib(bool *prevent, int32_t *pseq_dur, int32_t ble_dur)
 {
-    #ifndef DISABLE_WURX
     if (!boot_was_cold()) {
         ATM_LOG(D, "Enabling WuRX");
 	    wurx_enable();
     }
-    #endif
     return RV_NEXT;
 }
 
@@ -474,11 +472,6 @@ static void lunch_s_sleep(void)
     atm_pm_unlock(lock_hiber);
 }
 
-// Once we create it and call the cfm
-// the ASM in atm_adv will callback with ADV_ON State or whatever
-
-// S_OP(state, operation), next_state, handler
-// When we are in STATE, and then receive OPERATION, move to NEXT_STATE and call handler
 static const state_entry s_tbl[] = {
     // Initialize module
     {S_OP(S_INIT, OP_MODULE_INIT), S_IDLE, lunch_s_init},
