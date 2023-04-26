@@ -79,7 +79,5 @@ FIXME_EXAMPLE_USES_BLE := \
 
 ## TODO:
 
-- New PCB design; smaller, test points, WuRX antenna trace
-- Assign random BD address
 - Get a unique sticker for each with QR code or link or device ID
 - More accessible pairing (not just website)
