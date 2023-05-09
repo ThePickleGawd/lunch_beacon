@@ -1,3 +1,15 @@
+/**
+ *******************************************************************************
+ *
+ * @file lunch_beacon.c
+ *
+ * @brief LunchTrak Beacon Application Source Code
+ *
+ * Copyright (C) LunchTrak 2023
+ *
+ *******************************************************************************
+ */
+
 // C Stuff
 #include <stdio.h>
 #include <string.h>
@@ -33,6 +45,7 @@
 #include "lunch_button.h"
 #include "lunch_gatt.h"
 #include "lunch_nvds.h"
+#include "lunch_led.h"
 
 ATM_LOG_LOCAL_SETTING("lunch_beacon", V);
 
@@ -315,9 +328,15 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
             if(act_to_idx(act_idx) == IDX_LUNCH) {
                 // Lunch beacon confirmation (can start now)
                 atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_CFM);
+
+                // Blink LED to confirm
+                lunch_led_blink(LUNCH_LED_ACTIVE);
             } else {
                 // Pairing mode confirmation (can start now)
                 atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_CFM);
+
+                // Blink LED to confirm
+                lunch_led_blink(LUNCH_LED_PAIRING);
             }
         } break;
         case ATM_ADV_OFF: {
@@ -394,6 +413,10 @@ static void lunch_s_connected(void)
 static void lunch_s_disconnected(void)
 {
     ATM_LOG(V, "%s", __func__);
+    
+    // LED off indicator
+    lunch_led_blink(LUNCH_LED_OFF);
+
     atm_asm_move(S_TBL_IDX, OP_SLEEP);
 }
 
@@ -404,6 +427,9 @@ static void lunch_s_disconnected(void)
 static void lunch_s_timeout(void)
 {
     ATM_LOG(V, "%s", __func__);
+
+    // LED off indicator
+    lunch_led_blink(LUNCH_LED_OFF);
 
     if(app_env.current_adv_idx == LUNCH_ADV_TYPE) {
         atm_asm_move(S_TBL_IDX, OP_SLEEP);
@@ -470,6 +496,9 @@ static void lunch_s_stop_adv_and_pair(void)
 static void lunch_s_sleep(void)
 {
     atm_pm_unlock(lock_hiber);
+    lunch_led_off();
+
+    atm_pm_lock_info();
 }
 
 static const state_entry s_tbl[] = {

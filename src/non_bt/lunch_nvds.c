@@ -5,7 +5,7 @@
  *
  * @brief NVDS tag access functions
  *
- * Copyright (C) Atmosic 2022
+ * Copyright (C) LunchTrak 2023
  *
  *******************************************************************************
  */

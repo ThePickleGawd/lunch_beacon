@@ -3,9 +3,9 @@
  *
  * @file lunch_gatt.c
  *
- * @brief BLE ATT Server Example Source
+ * @brief Lunch GATT Server Source Code
  *
- * Copyright (C) Atmosic 2020-2021
+ * Copyright (C) LunchTrak 2023
  *
  *******************************************************************************
  */

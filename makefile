@@ -17,6 +17,7 @@ DRIVERS := \
 	atm_button \
 	atm_vkey \
 	sw_event \
+	led_blink \
 	lunch \
 
 LIBRARIES := prf
@@ -65,6 +66,7 @@ INCLUDES += $(SRC_BT) $(SRC_NON_BT) $(SRC_TOP)
 C_SRCS += \
 	$(SRC_NON_BT)/lunch_button.c \
 	$(SRC_NON_BT)/lunch_nvds.c \
+	$(SRC_NON_BT)/lunch_led.c \
 	$(SRC_BT)/lunch_gatt.c \
 
 flash_nvds.data := \
