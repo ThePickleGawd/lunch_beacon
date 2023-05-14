@@ -1,11 +1,11 @@
 /**
  *******************************************************************************
  *
- * @file BLE_adv.h
+ * @file lunch_beacon.h
  *
- * @brief BLE Advertising Application
+ * @brief LunchTrak Beacon Application Source Code
  *
- * Copyright (C) Atmosic 2020
+ * Copyright (C) LunchTrak 2023
  *
  *******************************************************************************
  */

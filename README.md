@@ -77,6 +77,12 @@ FIXME_EXAMPLE_USES_BLE := \
  lunch_gatt.c \
 ```
 
+## LED States
+
+As of now, the LED will only blink when entering pairing mode to avoid confusion.
+
+Please check src/non_bt/lunch_led.c for LED duration times
+
 ## TODO:
 
 - Get a unique sticker for each with QR code or link or device ID

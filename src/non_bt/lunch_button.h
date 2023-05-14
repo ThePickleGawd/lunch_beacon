@@ -5,7 +5,7 @@
  *
  * @brief KEY button Header
  *
- * Copyright (C) Atmosic 2022
+ * Copyright (C) LunchTrak 2023
  *
  *******************************************************************************
  */

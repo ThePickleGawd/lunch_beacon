@@ -5,7 +5,7 @@
  *
  * @brief KEY button handler
  *
- * Copyright (C) Atmosic 2022
+ * Copyright (C) LunchTrak 2023
  *
  *******************************************************************************
  */
@@ -27,13 +27,16 @@
 ATM_LOG_LOCAL_SETTING("lunch_button", V);
 
 // Button Configuration
-#define BUTTON_PIN 10
 #define BTN_PRESS_MIN_TIME_CS 200
 #define BTN_CHECK_PRESS_INTERVAL_CS 20
 #define MAX_PRESS_CHECKS (BTN_PRESS_MIN_TIME_CS / BTN_CHECK_PRESS_INTERVAL_CS)
+#ifndef PIN_BUTTON1_IO
+#define PIN_BUTTON1_IO 10
+#endif
 
 static press_event_cb event_cb;
 static sw_timer_id_t check_press_tid;
+static pm_lock_id_t lock_hiber;
 
 int check_press_counter = 0;
 
@@ -46,26 +49,30 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
     if(check_press_counter >= MAX_PRESS_CHECKS) {
         event_cb(); 
         check_press_counter = 0;
+
+        atm_pm_unlock(lock_hiber);
     } else {
-        if(atm_gpio_read_gpio(BUTTON_PIN) == 1) {
+        if(atm_gpio_read_gpio(PIN_BUTTON1_IO) == 1) {
             // Still pressing, keep checking
             sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
         } else {
             // Stopped pressing, abort
             check_press_counter = 0;
+            atm_pm_unlock(lock_hiber);
         }
     }
 }
 
 __FAST static void interrupt_hdlr(uint32_t mask)
 {
-    ATM_LOG(D, "Button Clicked");
+    ATM_LOG(V, "Button Press");
+    atm_pm_lock(lock_hiber);
 
-    atm_gpio_set_int_disable(BUTTON_PIN);
-    atm_gpio_clear_int_status(BUTTON_PIN);
+    atm_gpio_set_int_disable(PIN_BUTTON1_IO);
+    atm_gpio_clear_int_status(PIN_BUTTON1_IO);
 
-    atm_gpio_int_set_rising(BUTTON_PIN);
-    atm_gpio_set_int_enable(BUTTON_PIN);
+    atm_gpio_int_set_rising(PIN_BUTTON1_IO);
+    atm_gpio_set_int_enable(PIN_BUTTON1_IO);
 
     sw_timer_set(check_press_tid, BTN_CHECK_PRESS_INTERVAL_CS);
 }
@@ -77,13 +84,17 @@ void lunch_button_init(press_event_cb cb)
     check_press_tid = sw_timer_alloc(check_press, NULL);
 
     // Setup GPIO for button
-    atm_gpio_setup(BUTTON_PIN);
-    atm_gpio_set_input(BUTTON_PIN);
+    atm_gpio_setup(PIN_BUTTON1_IO);
+    atm_gpio_set_input(PIN_BUTTON1_IO);
 
-    interrupt_install_gpio(BUTTON_PIN, 3, interrupt_hdlr);    
+    interrupt_install_gpio(PIN_BUTTON1_IO, 3, interrupt_hdlr);    
 
-    atm_gpio_int_set_rising(BUTTON_PIN);
-    atm_gpio_set_int_enable(BUTTON_PIN);
+    atm_gpio_int_set_rising(PIN_BUTTON1_IO);
+    atm_gpio_set_int_enable(PIN_BUTTON1_IO);
+
+    // Lock Hiber
+    lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
+    atm_pm_unlock(lock_hiber);
 }
 
 void lunch_button_on_wake(void) {
