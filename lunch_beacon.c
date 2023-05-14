@@ -330,7 +330,7 @@ static void adv_state_change(atm_adv_state_t state, uint8_t act_idx, ble_err_cod
                 atm_asm_move(S_TBL_IDX, OP_CREATE_LUNCH_CFM);
 
                 // Blink LED to confirm
-                lunch_led_blink(LUNCH_LED_ACTIVE);
+                // lunch_led_blink(LUNCH_LED_ACTIVE);
             } else {
                 // Pairing mode confirmation (can start now)
                 atm_asm_move(S_TBL_IDX, OP_CREATE_PAIR_CFM);
@@ -415,7 +415,7 @@ static void lunch_s_disconnected(void)
     ATM_LOG(V, "%s", __func__);
     
     // LED off indicator
-    lunch_led_blink(LUNCH_LED_OFF);
+    // lunch_led_blink(LUNCH_LED_OFF);
 
     atm_asm_move(S_TBL_IDX, OP_SLEEP);
 }
@@ -429,7 +429,7 @@ static void lunch_s_timeout(void)
     ATM_LOG(V, "%s", __func__);
 
     // LED off indicator
-    lunch_led_blink(LUNCH_LED_OFF);
+    // lunch_led_blink(LUNCH_LED_OFF);
 
     if(app_env.current_adv_idx == LUNCH_ADV_TYPE) {
         atm_asm_move(S_TBL_IDX, OP_SLEEP);
@@ -495,10 +495,8 @@ static void lunch_s_stop_adv_and_pair(void)
 
 static void lunch_s_sleep(void)
 {
-    atm_pm_unlock(lock_hiber);
     lunch_led_off();
-
-    atm_pm_lock_info();
+    atm_pm_unlock(lock_hiber);
 }
 
 static const state_entry s_tbl[] = {

@@ -22,9 +22,9 @@ typedef struct {
 } lunch_led_blink_profile_t;
 
 static lunch_led_blink_profile_t lunch_led_profiles[3] = {
-    { .hi_dur = 50, .low_dur = 50, .times = 1, }, // OFF
-    { .hi_dur = 20, .low_dur = 10, .times = 1, }, // ACTIVE
-    { .hi_dur = 20, .low_dur = 10, .times = 3, }, // PAIRING
+    { .hi_dur = 10, .low_dur = 10, .times = 0, }, // OFF
+    { .hi_dur = 10, .low_dur = 10, .times = 0, }, // ACTIVE
+    { .hi_dur = 10, .low_dur = 10, .times = 3, }, // PAIRING
 };
 
 void lunch_led_blink(LUNCH_LED_STATE state) {

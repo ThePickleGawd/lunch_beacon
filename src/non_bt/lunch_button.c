@@ -36,6 +36,7 @@ ATM_LOG_LOCAL_SETTING("lunch_button", V);
 
 static press_event_cb event_cb;
 static sw_timer_id_t check_press_tid;
+static pm_lock_id_t lock_hiber;
 
 int check_press_counter = 0;
 
@@ -48,6 +49,8 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
     if(check_press_counter >= MAX_PRESS_CHECKS) {
         event_cb(); 
         check_press_counter = 0;
+
+        atm_pm_unlock(lock_hiber);
     } else {
         if(atm_gpio_read_gpio(PIN_BUTTON1_IO) == 1) {
             // Still pressing, keep checking
@@ -55,13 +58,15 @@ static void check_press(sw_timer_id_t timer_id, const void *ctx)
         } else {
             // Stopped pressing, abort
             check_press_counter = 0;
+            atm_pm_unlock(lock_hiber);
         }
     }
 }
 
 __FAST static void interrupt_hdlr(uint32_t mask)
 {
-    ATM_LOG(D, "Button Clicked");
+    ATM_LOG(V, "Button Press");
+    atm_pm_lock(lock_hiber);
 
     atm_gpio_set_int_disable(PIN_BUTTON1_IO);
     atm_gpio_clear_int_status(PIN_BUTTON1_IO);
@@ -86,6 +91,10 @@ void lunch_button_init(press_event_cb cb)
 
     atm_gpio_int_set_rising(PIN_BUTTON1_IO);
     atm_gpio_set_int_enable(PIN_BUTTON1_IO);
+
+    // Lock Hiber
+    lock_hiber = atm_pm_alloc(PM_LOCK_HIBERNATE);
+    atm_pm_unlock(lock_hiber);
 }
 
 void lunch_button_on_wake(void) {

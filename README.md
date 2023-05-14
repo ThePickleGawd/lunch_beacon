@@ -79,9 +79,9 @@ FIXME_EXAMPLE_USES_BLE := \
 
 ## LED States
 
-Please check src/non_bt/lunch_led.c for LED duration times
+As of now, the LED will only blink when entering pairing mode to avoid confusion.
 
-TODO: Make a table here
+Please check src/non_bt/lunch_led.c for LED duration times
 
 ## TODO:
 
