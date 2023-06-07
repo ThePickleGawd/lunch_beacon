@@ -12,8 +12,11 @@
 
 #include <inttypes.h>
 #include "arch.h"
+#include "nvds.h"
 
+#define NVDS_TAG_BLE_ADDR 0x01
 #define NVDS_TAG_LUNCH_DATA 0xD0
+
 #define SCHOOL_ID_ARR_LEN 6
 #define STUDENT_ID_ARR_LEN 10
 
@@ -25,6 +28,12 @@ typedef struct {
     uint8_t school_id[SCHOOL_ID_ARR_LEN];
     uint8_t student_id[STUDENT_ID_ARR_LEN];
 } __PACKED nvds_lunch_data_t;
+
+/**
+ * @brief Get lunch data from nvds tag
+ * @returns NVDS_OK on success
+*/
+uint8_t nvds_get_ble_addr(uint8_t *out, nvds_tag_len_t* len);
 
 /**
  * @brief Get lunch data from nvds tag

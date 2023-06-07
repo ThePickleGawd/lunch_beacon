@@ -19,6 +19,13 @@
 
 ATM_LOG_LOCAL_SETTING("lunch_nvds", V);
 
+uint8_t nvds_get_ble_addr(uint8_t *out, nvds_tag_len_t* len) {
+    uint8_t err = nvds_get(NVDS_TAG_BLE_ADDR, len, (uint8_t *) out);
+    if(err != NVDS_OK) ATM_LOG(E, "%s - err = %d", __func__, err);
+
+    return err;
+}
+
 uint8_t nvds_get_lunch_data(nvds_lunch_data_t *out)
 {
     nvds_tag_len_t len = sizeof(nvds_lunch_data_t);

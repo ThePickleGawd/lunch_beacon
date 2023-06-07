@@ -20,6 +20,7 @@ enum atts_attr_idx {
     ATTS_SVC_LUNCH,
     ATTS_CHAR_RW_STUDENT_ID,
     ATTS_CHAR_RW_SCHOOL_ID,
+    ATTS_CHAR_R_BLE_ADDR,
     ATTS_CHAR_CCCD,
 
     ATTS_ATTR_NUM
@@ -39,6 +40,9 @@ enum atts_attr_idx {
 
 // 33f68a3f-e981-4fd8-a13c-b6a0edd1928d
 #define CHAR_STUDENT_ID_UUID 0x33, 0xf6, 0x8a, 0x3f, 0xe9, 0x81, 0x4f, 0xd8, 0xa1, 0x3c, 0xb6, 0xa0, 0xed, 0xd1, 0x92, 0x8d
+
+// 44c50732-05a3-4a4b-a9ca-2a13fec120c6
+#define CHAR_BLE_ADDR_UUID 0x44, 0xc5, 0x07, 0x32, 0x05, 0xa3, 0x4a, 0x4b, 0xa9, 0xca, 0x2a, 0x13, 0xfe, 0xc1, 0x20, 0xc6
 
 /**
  *******************************************************************************

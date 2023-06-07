@@ -12,6 +12,7 @@
 #include "arch.h"
 #include "atm_gap.h"
 #include "atm_debug.h"
+#include "nvds.h"
 #include "atm_log.h"
 #include <stdio.h>
 #include <string.h>
@@ -84,6 +85,18 @@ static uint8_t atts_read_req(uint8_t conidx, uint8_t att_idx)
 {
     ATM_LOG(D, "%s: att_idx (%d)", __func__, att_idx);
 
+	// Requesting ble addr
+	if (att_idx == atts_attr_handle[ATTS_CHAR_R_BLE_ADDR]) {
+		uint8_t addr[12] = {}; nvds_tag_len_t len = 12; // ble addr are 6 bytes
+		nvds_get_ble_addr(addr, &len); 
+
+		if(addr == NULL) return ATT_ERR_APP_ERROR;
+
+		ATM_LOG(D, "Send read response for BLE addr");
+		ble_atmprfs_gattc_read_cfm(conidx, att_idx, addr, len);
+	}
+
+	// Requesting lunch data
 	nvds_lunch_data_t lunch_data = {};
 	nvds_get_lunch_data(&lunch_data);
 	
@@ -152,6 +165,7 @@ void lunch_atts_create_prf(void)
 	uint8_t svc_lunch_uuid[ATT_UUID_128_LEN] = {SVC_LUNCH_UUID};
 	uint8_t char_student_id_uuid[ATT_UUID_128_LEN] = {CHAR_STUDENT_ID_UUID};
 	uint8_t char_school_id_uuid[ATT_UUID_128_LEN] = {CHAR_SCHOOL_ID_UUID};
+	uint8_t char_ble_addr_uuid[ATT_UUID_128_LEN] = {CHAR_BLE_ADDR_UUID};
 
 	// Register lunch service and it's characteristics
 	atts_attr_handle[ATTS_SVC_LUNCH] = ble_atmprfs_add_svc(svc_lunch_uuid, 
@@ -160,9 +174,12 @@ void lunch_atts_create_prf(void)
 	ATTS_RW_SEC_PROPERTY, ATTS_DATA_SIZE);
 	atts_attr_handle[ATTS_CHAR_RW_SCHOOL_ID] = ble_atmprfs_add_char(char_school_id_uuid,
 	ATTS_RW_SEC_PROPERTY, ATTS_DATA_SIZE);
+	atts_attr_handle[ATTS_CHAR_R_BLE_ADDR] = ble_atmprfs_add_char(char_ble_addr_uuid,
+	BLE_ATT_READ_NO_SECURITY, ATTS_DATA_SIZE);
 	atts_attr_handle[ATTS_CHAR_CCCD] = ble_atmprfs_add_client_char_cfg();
 
-	ATM_LOG(D, "%s: SVC (%d), RW_STUDENT_ID (%d), RW_SCHOOL_ID (%d) CCCD (%d)", __func__,
+	ATM_LOG(D, "%s: SVC (%d), RW_STUDENT_ID (%d), RW_SCHOOL_ID (%d) R_BLE_ADDR (%d) CCCD (%d)", __func__,
 	atts_attr_handle[ATTS_SVC_LUNCH], atts_attr_handle[ATTS_CHAR_RW_STUDENT_ID],
-	atts_attr_handle[ATTS_CHAR_RW_SCHOOL_ID], atts_attr_handle[ATTS_CHAR_CCCD]);
+	atts_attr_handle[ATTS_CHAR_RW_SCHOOL_ID], atts_attr_handle[ATTS_CHAR_R_BLE_ADDR],
+	atts_attr_handle[ATTS_CHAR_CCCD]);
 }
