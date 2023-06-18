@@ -3,7 +3,7 @@
 #include "ble_att.h"
 #include "atm_gap.h"
 
-#define CFG_GAP_DEV_NAME "Lunch"
+#define CFG_GAP_DEV_NAME LUNCHTRAK_ID
 #define CFG_GAP_APPEARANCE ATM_GAP_APPEARANCE_GENERIC_TAG
 
 
