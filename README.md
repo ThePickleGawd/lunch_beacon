@@ -87,3 +87,4 @@ Please check src/non_bt/lunch_led.c for LED duration times
 
 - Get a unique sticker for each with QR code or link or device ID
 - More accessible pairing (not just website)
+- Make it work :(
